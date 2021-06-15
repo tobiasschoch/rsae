@@ -1,18 +1,33 @@
-exportPattern("^[[:alpha:]]+")
-#register the dll
-useDynLib(rsae, .registration=TRUE)
-#
-#S3 methods of saemodel
+# import
+importFrom("graphics",
+    "par", "lines", "axis", "grid", "box", "legend", "arrows")
+importFrom("stats",
+    "model.frame", "model.response", "model.matrix", "pnorm", "dnorm", "rnorm",
+    "pt", "printCoefmat", "median")
+
+# saemodel
+export(saemodel)
 S3method(print, saemodel)
 S3method(summary, saemodel)
 S3method(as.matrix, saemodel)
-#
-# S3 methods of fitsaemodel
+
+# fitsaemodel
+export(fitsaemodel)
+export(fitsaemodel.control)
 S3method(print, fitsaemodel)
 S3method(summary, fitsaemodel)
 S3method(coef, fitsaemodel)
-#
-# S3 methods of robpredict
+
+# robpredict
+export(robpredict)
 S3method(print, meanssaemodel)
 S3method(plot, meanssaemodel)
-S3method(residuals, meanssaemodel) 
+S3method(residuals, meanssaemodel)
+
+# varia
+export(convergence)
+export(makedata)
+
+
+#register the dll
+useDynLib(rsae, .registration = TRUE)

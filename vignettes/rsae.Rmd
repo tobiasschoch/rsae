@@ -1,0 +1,442 @@
+---
+title: "Vignette: Robust Estimation Under the Unit-Level SAE Model"
+author: "Tobias Schoch"
+output:
+    html_document:
+        highlight: tango
+vignette: >
+  %\VignetteIndexEntry{Robust Estimation Under the Unit-Level SAE Model}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "",
+    prompt = TRUE
+)
+```
+
+```{css, echo = FALSE}
+.my-sidebar-orange {
+    padding-left: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.25rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #eee;
+    border-left-width: 0.75rem;
+    border-radius: .25rem;
+    border-left-color: #ce5b00;
+}
+
+.my-sidebar-blue {
+    padding-left: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.25rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #eee;
+    border-left-width: 0.75rem;
+    border-radius: .25rem;
+    border-left-color: #1f618d;
+}
+```
+
+## Outline
+
+The `rsae` package offers functions to estimate
+
+* model **A**, *area-level* SAE model (Fay-Herriot model),
+* model **B**, basic *unit-level* SAE model,
+
+by either maximum likelihood or robust methods. The classification of the models (A or B) follows the proposal of [Rao (2003)](#biblio). Currently, the package includes the following robust (i.e. bounded-influence estimating equation) methods for model B:
+
+* Huber-type $M$-estimation, using a slight generalization of Huber's Proposal 2 to estimate the variance components; cf., [Richardson and Welsh (1995)](#biblio), [Sinha and Rao (2009)](#biblio), [Schoch (2012)](#biblio),
+* variance estimation and MSPE estimation (parametric bootstrap; see [Sinha and Rao, 2009](#biblio))
+
+This vignette is organized as follows:
+
+* 1 Getting started
+* 2 Exploring the data
+* 3 Setting up the model
+* 4 Parameter estimation
+* 5 Robust prediction of the area-level means
+
+<div class="my-sidebar-blue">
+<p style="color: #1f618d;">
+**Citable (companion) paper with methodological details**
+</p>
+Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* 41(4), pp. 243-265.
+<p>
+</p>
+</div>
+
+## 1 Getting started
+
+The package can be installed from CRAN using
+
+```{r, eval = FALSE}
+install.packages("rsae")
+```
+
+Once the `rsae` package has been installed, we need to load it to the current session by
+
+```{r}
+library(rsae)
+```
+
+<div class="my-sidebar-blue">
+<p style="color: #1f618d;">
+**Good to know.**
+</p>
+<p>
+The model fitting exercise with `rsae` takes three steps.
+
+* setting up a model using `saemodel()`,
+* fitting the model with `fitsaemodel()`,
+* predicting the random effects and the area-specific means using `robpredict()`.
+
+These steps will be discussed in subsequent sections.
+</p>
+</div>
+
+## 2 Exploring the data
+
+First of all, we have to set up a model. We use the `landsat` data from [Battese et al (1988)](#biblio), the landmark paper on the basic unit-level SAE model (here: units = segments, each about 250 hectares; areas = Counties).
+
+
+First, we have to load the `landsat` data into the workspace.
+
+```{r}
+data(landsat)
+```
+
+Next, we will explore the data. The `names` command reports the names of the variables in the `landsat` data.
+
+```{r}
+names(landsat)
+```
+
+Get a table (i.e., an aggregation) of the variable CountyName.
+
+
+```{r}
+table(landsat$CountyName)
+```
+
+So, there are twelve areas -- the smallest areas (Cerro Gordo, Hamilton, and Worth) contain one unit, the largest area, Hardin, involves six units.
+
+Next, we want to have a look at observations no. 30 to 35 and some interesting variables.
+
+```{r}
+landsat[30:35, c("HACorn", "PixelsCorn", "PixelsSoybeans", "CountyName",
+    "outlier")]
+```
+
+Note that I added the indicator variable outlier to the original data. This variable flags observation no. 33 as outlier. This is in line with [Battese et al (1988)](#biblio), who indicate that for both observations no. 32 and 33, the interviewed farm operators reported for HACorn the same value. Despite the same number of estimated hectares under corn (i.e., 88.59), the readings for PixelsCorn are very different for obs. no. 32 and 33. To be precise, we would call observation no. 33 a leverage point rather than an outlier.
+
+The following figure is a display of the (standardized) residuals of the linear model against the leverage. Note that obs. no. 33 is very close the bound on the values of Cook's distance.
+
+```{r}
+    linmodel <- lm(HACorn ~ PixelsCorn + PixelsSoybeans, data = landsat)
+    plot(linmodel, 5)
+```
+
+Note that [Sinha and Rao (2009)](#biblio), on the other hand, included this bad leverage point in their simulation exercise and obtained completely different estimates.
+
+## 3 Setting up the model
+
+Having explored the data, we consider setting up the model. The (first of their) model writes [Battese et al (1988)](#biblio)
+
+$$
+\begin{equation*}
+    HACorn_{i,j} = \alpha + \beta_1 \cdot PixelsCorn_{i,j}
+    + \beta_2 \cdot PixelsSoybeans_{i,j} + u_i + e_{i,j},
+\end{equation*}
+$$
+
+**FIXME: e_ij etc. => list**
+
+where $j=1,\ldots, n_i$,  $i=1, \ldots,12$.
+
+The package provides the function `saemodel()` to set up a model. The model is specified by mainly three arguments: (1) the `formula` argument defines the fixed-effect part (the $\sim$ operator separates dependent and independent variables), (2) the `area` argument specifies the area-level random effect (here, the variable CountyName serves as area identifier; note the leading $\sim$ operator), (3) the `data` argument specifies the data (a data.frame). The only "difficulty" here is that we use `data=subset(landsat, subset=(outlier==FALSE))` to include only non-outlying observations, instead of `data=landsat`. We call our model `bhfmodel` (Batteese, Harter, and Fuller).
+
+```{r}
+bhfmodel <- saemodel(HACorn ~ PixelsCorn + PixelsSoybeans, area = ~ CountyName,
+    data = subset(landsat, subset = (outlier == FALSE)))
+```
+
+Suppose we have generated several different models (e.g., using different independent variables), and they all reside in the current workspace.  It may be difficult to figure out which of them is the `bhfmodel` (except you you have adopted unique naming conventions). For situations like this, type the name of the model to get some information.
+
+If you need to know more about a particular model, you may use the `summary(bhfmodel)` method.
+
+```{r, echo = FALSE}
+summary(bhfmodel)
+```
+
+## 4 Parameter estimation
+
+Having set up our model, we consider estimating the parameters of the Gaussian core model by different methods. All fitting is done using the following workhorse function
+
+```{r, eval = FALSE}
+fitsaemodel(method, model, ...)
+```
+
+Depending on the arguments delivered, `fitsaemodel` decides what method to use. The decision is based on the `method` argument.
+
+### 4.1 Maximum-likelihood estimation
+
+To start with, we compute the usual maximum likelihood (ML) estimates. Therefore, we call `fitsaemodel` with `method = "ml"` (the ML methods does not need any additional `...` arguments).
+
+```{r}
+mlfit <- fitsaemodel("ml", bhfmodel)
+```
+
+Type name of the fit, i.e. `mlfit`, to get a display of the model fit.
+
+```{r}
+mlfit
+```
+
+To learn more about the fit, we may call the `summary()` method.  In particular, the model summary supplies us with inferential statistics of fixed effects.
+
+```{r}
+summary(mlfit)
+```
+
+**FIXME**: coef 
+
+<div class="my-sidebar-orange">
+<p style="color: #ce5b00;">
+**IMPORTANT. The estimator does not converge**
+</p>
+
+```{r, echo = FALSE}
+est <- fitsaemodel("ml", bhfmodel, niter = 3)
+```
+<p>
+we follow the hint and call the `convergence()` method:
+```{r, echo = FALSE}
+convergence(est)
+```
+Now, it may happen that the ML-method of `fitsaemodel()` does not converge (even if the parameters have not been modified). A remedy is to initialize the ML method by a regression $S$-estimator (sic!), calling `fitsaemodel()` with `init = "s"`. Obviously, this approach is not optimal in terms of computing time. Nonetheless, by this specification, `fitsaemodel()` enters the "safe mode" of robust Huber-type *M*-estimation and applies several checks whether the algorithm behaves well (these checks are ignored in the default mode).
+
+It consist of the following blocks:
+
+* Block 1 reports the default or user-specified max number of iterations, `niter`, and the numeric tolerance, `acc`, used in the termination rule of the algorithms.
+* Block 2 reports the number of iterations that each of the estimating equation--specific (EE-specific) loops (aka inner loops) and the overall loop (aka outer loop) used to conform to the termination rule. Each row in the table represents a single run of the overall loop. In the example, the algorithm needed 7 overall loops. The entries of a row refer to the EE-specific number of iterations in a particular overall loop.  It is evident that the number of (inner-loop) iterations for `fixeff` and `residual var` become smaller, the higher the number of outer/overall loops. This is not (and will never be) the case for `area raneff var` because it is obtained using a different optimization method. In general, we can feel confident if the number of inner-loop iterations decrease (in the case of `fixeff` and `residual var`). However, there are situations where the algorithm converges perfectly without featuring such a nice decrease in the number of inner-loop iterations.
+</p>
+</div>
+
+
+<div class="my-sidebar-blue">
+<p style="color: #1f618d;">
+**Good to know. When the mixed linear model is not appropriate**
+</p>
+<p>
+Suppose that our data do not have area-specific variation. Notably, we shall generate data based on the linear model,
+$$
+\begin{equation*}
+   y_{i,j} =  (1, \; x_{i,j})^T \beta + e_{i,j},
+\end{equation*}
+$$
+where $x_{i,j} \sim N(0,1)$, $e_{i,j}\sim N(0,1)$, $\beta=(1,1)^T$, $n_i=n=10$, $\forall i=1, \ldots,10$ (balanced data). The following code generates the data.
+
+```{r, echo = FALSE}
+set.seed(12345)
+n <- 200; beta <- c(1, 1)
+cst <- rep(1, n)
+x <- rnorm(n)
+y <- as.matrix(cbind(cst, x)) %*% beta + rnorm(n)
+areaid <- rep(1:10, each=10)
+df <- data.frame(y=y, x=x, areaid=areaid)
+m <- saemodel(y ~ x, area=~areaid, data=df)
+fitsaemodel("ml", m)
+```
+The report indicates that the random-effect variance is close to zero or equal to zero. Therefore, the MLM model is not appropriate.
+</p>
+</div>
+
+
+## 4.2 Huber-type *M*-estimation
+
+Huber-type *M*-estimation is the recommended estimation method for situations where the response variable is supposed to be (moderately) contaminated. The *M*-estimators downweight the influence of outlying observations (in the vector of responses) on the estimates. Notably, they bound the influence of outliers. But, no attempt is made to limit the effect of leverage points (see above). In principle, one may adapt generalized regression *M*-estimators (GM) to the family of linear mixed-level models in order to deal with influential observations/leverage (i.e., to bound also the influence of the design matrix). This has been done by [Richardson (1997)](#biblio). However, in terms of numerical properties, the Schweppe- and Mallows-type weighted *GM*-estimators turned out to be extremely unstable [Richardson (1995)](#biblio). Therefore, we propose to use the *S*-estimator (with constrained parameter space) if the data are heavily contaminated and/or contain influential observations/leverage (see below).
+
+Next, we discuss two different fitting modes for the Huber-type *M*-estimation method.
+
+* If the response variable is supposed to be uncontamined or contaminated by only a couple of outliers, I recommend to use the (very fast) *default mode*.
+* If the response variable is moderately contaminated and/or if the *default-mode algorithm failed to converge*, I recommend the *safe mode*.
+
+### 4.2.1 Default mode
+
+The default-mode setup of the Huber-type *M*-estimation exercise is
+
+```{r}
+huberfit <- fitsaemodel("huberm", bhfmodel, k = 1.5)
+```
+
+where `k` denotes the robustness-tuning constant of the Huber $\psi$-function ($0<k \leq \infty$; note that (in the limit) $k = \infty$ leads to the ML estimates). (*NOTE:* that in the simple location-scale model, the choice of `k = 1.345` leads to estimates which feature an asymptotic relative efficiency w.r.t. the ML estimate of approx. 95\% at the true (uncontamined) Gaussian core model. This property does *not* directly carry over to the estimates of mixed-linear models!)
+
+```{r}
+huberfit
+```
+
+To learn more about the fit, we can use the `summary()` method.
+
+```{r}
+summary(huberfit)
+```
+
+The output is separated into 2 blocks:
+
+* Block 1 reports some inferential statistics of the fixed-effects part.
+* Block 2 reports the degree of down-weighting outlying residuals at the final iteration. The degree of down-weighting is reported for all estimating equations (EE) separately. In general $d=1$, if no down-weighting took place. Conversely, the smaller $d$, the more outlying residuals have been down-weighted (and/or the same outliers are heavier down-weighted).
+
+In addition, the `convergence()` method supplies us with a report on the convergence of the method.
+
+
+### 4.2.2 Safe mode
+
+The safe mode should be used when the data are supposed to be moderately contaminated and/or the algorithm in default mode failed to converge. The safe-mode algorithm is initialized by a high-breakdown-point regression estimator. However, it is only safe up to a certain degree of contamination (i.e., breakdown-point is rather low for *M*-estimators). In the presence of too many outliers, the *M*-estimator will break down.
+
+
+<div class="my-sidebar-orange">
+<p style="color: #ce5b00;">
+**IMPORTANT.**
+</p>
+In order to use the safe-mode functions, you need the `robustbase` package [Maechler et al. (2021)](#biblio).
+<p>
+</p>
+</div>
+
+The safe mode is entered if one specifies (in `fitsaemodel()`) either:
+
+* `init = "lts"` for initializing the method by a fast-LTS regression estimator [Rousseeuw, 1984](#biblio);[Rousseeuw and van Driessen, 2006](#biblio)),
+* `init = "s"` for initializing the method by a regression *S*-estimator ([Rousseeuw and Yohai, 1984](#biblio);[Salibian-Bbarerra and Yohai, 2006](#biblio)).
+
+
+Also, the safe mode uses a couple of tests to check whether the estimates at consecutive iterations behave well. Notably, it prevents cycling estimates (i.e., the situation when the algorithm is trapped in a flip-flop), which typically occurs for very small robustness-tuning constants).
+
+In general, the results of `fitsaemodel` with either `init = "s"` or `init = "lts"` are the same. For data with more than 50,000 observations, `init = "s"` is considerably faster.
+
+## 5 Robust prediction of the area-level means
+
+Once the parameters of the Gaussian core model have been estimated robustly, we consider (robustly) predicting the random effects. [Sinha and Rao (2009)](#biblio) proposed to solve the robustified mixed model equations [Fellner (1986)](#biblio) by a Newton-Raphson-type updating scheme that is obtained from a Taylor-series expansion of the robustified mixed model equations. Consequently, computation is very involved.
+
+However, [Schoch (2012)](#biblio) showed that robust predictions of the area-specifc means can be obtained far more easily by means of the robust predictor of random effects due to [Copt and Victoria-Feser (2009)](#biblio); see also [Heritier et al. (2009, p. 113-114)](#biblio). Namely, since the robustly estimated parameters of the core Gaussian model determine the model completely, prediction is straightforward.
+
+The workhorse function for (robust) prediction is given by
+
+```{r, eval = FALSE}
+robpredict(fit, areameans = NULL, k = NULL, reps = NULL)
+```
+
+`fit` is a fitted model [an object produced by `fitsaemodel()`], `k` is the robustness-tuning constant (of the Huber $\psi$-function) for robust prediction.
+
+* By default `k` is `NULL` which means that the procedure takes the same `k` as has been used for estimating the parameters of the core model.
+* The robustness-tuning constant `k` does not necessarily be the same as the one used in `fitsaemodel()`.
+
+
+Further, choosing `k` sufficiently large (e.g., `k = 20000` should work in (almost) all situations), `robpredict` produces the usual EBLUP predictions.
+
+If `areameans = NULL` (the default setting), the prediction is based on the same data that have been used for the model fitting exercise (i.e., within-sample prediction). However, in the SAE context, we are usually interested in (robustly) predicting the small-area means. Therefore, we deliver the area-specific population means through `areameans`.
+
+In addition, the `robpredict()` function can compute
+area-specific mean squared prediction errors (MSPE) by means of a (robust) parametric bootstrap method; see [Sinha and Rao (2009)](#biblio).  In order to obtain MSPE, we need to specify the number of bootstrap replicates, `reps`.
+
+I recommend to start with relatively small values of `reps`, e.g., `reps=100`, since large values of `reps` are associated with a large computational effort. Once you get an intuition of how much time the algorithm consumes, you can try larger values of `reps`.
+
+In the `landsat` example, the county-specific population means of pixels of the segments under corn and soybeans are recorded in the variables MeanPixelsCorn and MeanPixelsSoybeans, respectively. Note that each sample segment in a particular county has assigned the county-specific mean (in the `landsat` data). Therefore, each population mean of the variables MeanPixelsCorn and MeanPixelsSoybeans occurs $n_i$ times. The unique county-specific population means are obtained using
+
+```{r}
+d <- unique(landsat[-33, c("MeanPixelsCorn", "MeanPixelsSoybeans", "CountyName")])
+d <- cbind(rep(1,12), d)
+rownames(d) <- d$CountyName
+d <- d[,1:3]
+```
+
+Let us have a look at `d`.
+```{r}
+d
+```
+
+The first column of `d` is a dummy variable (the `bhfmodel` has an intercept term). The second and third column represent the county-specific population means of segments under corn and soybeans (the rows of the above table are labeled with the county names).
+
+Next, we consider predicting the random and fixed effects and the county means. Note that we do not explicitly specify `k`. This means that the procedure uses the same `k` as the one that has been used for robust estimation (here, the model has been estimated by `method = "ml"` which is equivalent to $k=\infty$). MSPE is obtained using 500 bootstrap replicates.
+
+```{r}
+pr <- robpredict(mlfit, areameans = d, reps = 500)
+```
+
+The results are
+
+```{r}
+pr
+```
+
+and a visual display of the predicted county means
+
+```{r}
+plot(pr)
+```
+
+another plot, but with lines; here the predicted means are sorted in ascending order
+
+```{r}
+plot(pr, type = "l", sort = "means")
+```
+
+Once the area-specific random effects have been predicted (by means of robust methods), we can have a look at the residuals. Note that the residuals are given by
+
+$$
+\begin{equation}
+    r_{i,j} = y_{i,j} - x_{i,j}^T\hat{\beta}^{R} - \hat{u}_{i}^{R},
+\end{equation}
+$$
+
+where the superscript $R$ highlights the fact that robust estimates/predictions are used. Obviously, since the residuals depend on $\hat{u}_{i}^R$ (which is depends itself on the user-specified robustness-tuning constant), a residual analysis can only take place subsequent to robustly predicting $u_i$. This is contrast to the standard ML (or REML) case where $\hat{u_i}$ is readily available having estimated the fixed- and random-effects parameters.
+
+The residuals may be used for an QQ plot. (Note that `bhfmodel` is not optimal in terms of the tail behavior of the residuals)
+
+```{r}
+res <- residuals(pr)
+qqnorm(res)
+qqline(res)
+```
+
+
+---
+
+## References {#biblio}
+
+Copt, S. and M.-P. Victoria-Feser (2009). *Robust Predictions in Mixed Linear Models*. Research Report, University of Geneva.
+
+Battese, G.E., R.M. Harter, and W.A. Fuller (1988). An Error-Components Model for Prediction of County Crop Areas Using Survey and Satellite Data. *Journal of the American Statistical Association* 83, pp. 28-36.
+
+Fellner, W. (1986). Robust estimation of variance components. *Technometrics* 28, pp. 51-60.
+
+Heritier, S., E. Cantoni, S. Copt, and M.-P. Victoria-Feser (2009). *Robust methods in Biostatistics*. New York: John Wiley and Sons.
+
+Rao, J.N.K. (2003). *Small Area Estimation*, New York: John Wiley and Sons.
+
+Richardson, A.M. (1997). Bounded Influence Estimation in the Mixed Linear Model. *Journal of the American Statistical Association* 92, pp. 151-161.
+
+Richardson, A.M. (1995). *Some problems in estimation in mixed linear models*. PhD thesis, Australian National University.
+
+Richardson, A.M. and A.H. Welsh (1995): Robust restricted maximum likelihood in mixed linear model. *Biometrics* 51, pp. 1429-1439.
+
+Rousseeuw, P.J. (1984). Least Median of Squares Regression. *Journal of the American Statistical Association* 79, pp. 871-880.
+
+Rousseeuw, P.J. and V.J. Yohai (1984). *Robust regression by means of S-estimators*, in: Robust and Nonlinear Time Series, Franke, J., W. Härdle, and R.D. Martin (eds.), Lecture Notes in Statistics 26, pp. 256-272, New York: Springer.
+
+Rousseeuw, P.J. and K. van Driessen (2006). Computing LTS Regression for Large Data Sets, *Data Mining and Knowledge Discovery* 12, pp. 29-45.
+
+Rousseeuw, P.J., C. Croux, V. Todorov, A. Ruckstuhl, M. Salibian-Barrera, T. Verbeke, M. Koller, M. Maechler (2011). *robustbase: Basic Robust Statistics*. R package version 0.7-6. URL http://CRAN.R-project.org/package=robustbase.
+
+Salibian-Barrera, M. and V.J. Yohai (2006). A fast algorithm for S-regression estimates. *Journal of Computational and Graphical Statistics* 15, pp. 414-427.
+
+Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* 41(4), pp. 243-265.
+
+Sinha, S.K. and J.N.K. Rao (2009). Robust small area estimation. *Canadian Journal of Statistics* 37, pp. 381-399.

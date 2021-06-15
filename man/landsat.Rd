@@ -2,56 +2,40 @@
 \alias{landsat}
 \docType{data}
 \title{
-LANDSAT data: Prediction of County Crop Areas Using Survey and Satellite Data
+LANDSAT Data: Prediction of County Crop Areas Using Survey and Satellite Data
 }
 \description{
-The \code{landsat} data.frame is a compilation (by Battese et al., 1988)
+The \code{landsat} data is a compilation (by Battese et al., 1988)
 of survey and satellite data. It consists of data on segments (primary
-sampling unit; 1 segement =approx= 250 hectares) under corn and soybeans
+sampling unit; 1 segement approx. 250 hectares) under corn and soybeans
 for 12 counties in north-central Iowa; see Details, below.
 }
 \usage{data(landsat)}
 \format{
     A data frame with 37 observations on the following 10 variables.
     \describe{
-        \item{\code{SegmentsInCounty}}{
-            a numeric vector; no. of segments per county
-        }
-        \item{\code{SegementID}}{
-            a numeric vector; sample segment identifier (per county)
-        }
-        \item{\code{HACorn}}{
-            a numeric vector; hectares of corn for each sample segment (as
-            reported in the June 1978 Enumerative Survey)
-        }
-        \item{\code{HASoybeans}}{a numeric vector; hectares of soybeans for
-            each sample segment (as reported in the June 1978 Enumerative
-            Survey)
-        }
-        \item{\code{PixelsCorn}}{
-            a numeric vector; no. of pixels classified as corn for each
-            sample segment (LANDSAT readings)
-        }
-        \item{\code{PixelsSoybeans}}{
-            a numeric vector; no. of pixels classified as soybeans for each
-            sample segment (LANDSAT readings)
-        }
-        \item{\code{MeanPixelsCorn}}{
-            a numeric vector; county mean number of pixels classified as corn
-        }
-        \item{\code{MeanPixelsSoybeans}}{
-            a numeric vector; county mean number of pixels classified as
-            soybeans
-        }
-        \item{\code{outlier}}{
-            a logical vector; flags observation no. 33 as outlier
-        }
-        \item{\code{CountyName}}{
-            a factor with levels (i.e., county names) \code{Cerro Gordo}
-            \code{Hamilton} \code{Worth} \code{Humboldt} \code{Franklin}
-            \code{Pocahontas} \code{Winnebago} \code{Wright} \code{Webster}
-            \code{Hancock} \code{Kossuth} \code{Hardin}
-        }
+        \item{\code{SegmentsInCounty}}{a numeric vector; no. of segments
+            per county.}
+        \item{\code{SegementID}}{a numeric vector; sample segment
+            identifier (per county).}
+        \item{\code{HACorn}}{a numeric vector; hectares of corn for each
+            sample segment (as reported in the June 1978 Enumerative Survey).}
+        \item{\code{HASoybeans}}{a numeric vector; hectares of soybeans
+            for each sample segment (as reported in the June 1978
+            Enumerative Survey).}
+        \item{\code{PixelsCorn}}{a numeric vector; no. of pixels classified
+            as corn for each sample segment (LANDSAT readings).}
+        \item{\code{PixelsSoybeans}}{a numeric vector; no. of pixels
+            classified as soybeans for each sample segment (LANDSAT readings).}
+        \item{\code{MeanPixelsCorn}}{a numeric vector; county mean number
+            of pixels classified as corn.}
+        \item{\code{MeanPixelsSoybeans}}{a numeric vector; county mean
+            number of pixels classified as soybeans.}
+        \item{\code{outlier}}{a logical vector; flags observation no. 33
+            as outlier.}
+        \item{\code{CountyName}}{a factor with levels (i.e., county names)
+            Cerro Gordo, Hamilton, Worth, Humboldt, Franklin, Pocahontas,
+            Winnebago, Wright, Webster, Hancock, Kossuth, Hardin.}
     }
 }
 \details{
@@ -84,9 +68,10 @@ Observations No. 33 has been flaged as outlier (cf., Battese et al.
 The data \code{landsat} is from Table 1 of Battese et al. (1988, p. 29).
 }
 \references{
-Battese, G.E, R.M. Harter, and W.A. Fuller (1988): An Error-Components
-Model for Prediction of County Crop Areas Using Survey and Satellite
-Data, \emph{Journal of the American Statistical Association} 83, pp. 28--36.
+Battese, G. E., Harter, R. M., and W.A. Fuller (1988).
+    An error component model for prediction of county crop areas using.
+    \emph{Journal of the American Statistical Association} 83, 28-36.
+    \doi{https://doi.org/10.2307/2288915}
 }
 \examples{
 data(landsat)

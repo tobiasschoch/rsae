@@ -1,0 +1,10 @@
+# github stuff
+^\.git$
+^\.github$
+^\.gitattributes$
+^\.gitignore$
+^README\.md$
+# varia
+^inst/varia$
+# license (used for GitHub)
+^LICENSE
