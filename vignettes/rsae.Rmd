@@ -46,15 +46,24 @@ knitr::opts_chunk$set(
 
 ## Outline
 
-The `rsae` package offers functions to estimate
+In small area estimation (SAE), we distinguish two types of SAE models
 
-* model **A**, *area-level* SAE model (Fay-Herriot model),
-* model **B**, basic *unit-level* SAE model,
+* model **A**: *area-level* model (Fay-Herriot model),
+* model **B**: basic *unit-level* model,
 
-by either maximum likelihood or robust methods. The classification of the models (A or B) follows the proposal of [Rao (2003)](#biblio). Currently, the package includes the following robust (i.e. bounded-influence estimating equation) methods for model B:
+The classification of the models (A or B) follows [Rao (2003)](#biblio). The current version of the `rsae` package implements the following estimation methods under the **unit-level model (model B)**:
 
-* Huber-type $M$-estimation, using a slight generalization of Huber's Proposal 2 to estimate the variance components; cf., [Richardson and Welsh (1995)](#biblio), [Sinha and Rao (2009)](#biblio), [Schoch (2012)](#biblio),
-* variance estimation and MSPE estimation (parametric bootstrap; see [Sinha and Rao, 2009](#biblio))
+* maximum-likelihood estimation,
+* robust Huber type *M*-estimation.
+
+<div class="my-sidebar-orange">
+<p style="color: #ce5b00;">
+**IMPORTANT.**
+</p>
+<p>
+The *M*-estimators are of type RML II in the sense of [Richardson and Welsh (1995)](#biblio); see [Schoch, (2012)](#biblio). The robust estimators of [Sinha and Rao, 2009](#biblio) are **not** RML II estimators. Therefore, the methods of this package **do not** compute the estimators of [Sinha and Rao, 2009](#biblio).
+</p>
+</div>
 
 This vignette is organized as follows:
 
@@ -63,6 +72,7 @@ This vignette is organized as follows:
 * 3 Setting up the model
 * 4 Parameter estimation
 * 5 Robust prediction of the area-level means
+* 6 Mean square error estimation
 
 <div class="my-sidebar-blue">
 <p style="color: #1f618d;">
@@ -178,11 +188,7 @@ summary(bhfmodel)
 
 ## 4 Parameter estimation
 
-Having set up our model, we consider estimating the parameters of the Gaussian core model by different methods. All fitting is done using the following workhorse function
-
-```{r, eval = FALSE}
-fitsaemodel(method, model, ...)
-```
+Having set up our model, we consider estimating the parameters of the Gaussian core model by different methods. All fitting is done using the following workhorse function `fitsaemodel(method, model, ...)`.
 
 Depending on the arguments delivered, `fitsaemodel` decides what method to use. The decision is based on the `method` argument.
 
@@ -205,6 +211,9 @@ To learn more about the fit, we may call the `summary()` method.  In particular,
 ```{r}
 summary(mlfit)
 ```
+
+
+
 
 **FIXME**: coef 
 
@@ -366,8 +375,9 @@ The first column of `d` is a dummy variable (the `bhfmodel` has an intercept ter
 
 Next, we consider predicting the random and fixed effects and the county means. Note that we do not explicitly specify `k`. This means that the procedure uses the same `k` as the one that has been used for robust estimation (here, the model has been estimated by `method = "ml"` which is equivalent to $k=\infty$). MSPE is obtained using 500 bootstrap replicates.
 
+
 ```{r}
-pr <- robpredict(mlfit, areameans = d, reps = 500)
+pr <- robpredict(mlfit, areameans = d, reps = 100)
 ```
 
 The results are

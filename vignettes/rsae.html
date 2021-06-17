@@ -516,16 +516,24 @@ summary {
 </style>
 <div id="outline" class="section level2">
 <h2>Outline</h2>
-<p>The <code>rsae</code> package offers functions to estimate</p>
+<p>In small area estimation (SAE), we distinguish two types of SAE models</p>
 <ul>
-<li>model <strong>A</strong>, <em>area-level</em> SAE model (Fay-Herriot model),</li>
-<li>model <strong>B</strong>, basic <em>unit-level</em> SAE model,</li>
+<li>model <strong>A</strong>: <em>area-level</em> model (Fay-Herriot model),</li>
+<li>model <strong>B</strong>: basic <em>unit-level</em> model,</li>
 </ul>
-<p>by either maximum likelihood or robust methods. The classification of the models (A or B) follows the proposal of <a href="#biblio">Rao (2003)</a>. Currently, the package includes the following robust (i.e. bounded-influence estimating equation) methods for model B:</p>
+<p>The classification of the models (A or B) follows <a href="#biblio">Rao (2003)</a>. The current version of the <code>rsae</code> package implements the following estimation methods under the <strong>unit-level model (model B)</strong>:</p>
 <ul>
-<li>Huber-type <span class="math inline">\(M\)</span>-estimation, using a slight generalization of Huber’s Proposal 2 to estimate the variance components; cf., <a href="#biblio">Richardson and Welsh (1995)</a>, <a href="#biblio">Sinha and Rao (2009)</a>, <a href="#biblio">Schoch (2012)</a>,</li>
-<li>variance estimation and MSPE estimation (parametric bootstrap; see <a href="#biblio">Sinha and Rao, 2009</a>)</li>
+<li>maximum-likelihood estimation,</li>
+<li>robust Huber type <em>M</em>-estimation.</li>
 </ul>
+<div class="my-sidebar-orange">
+<p style="color: #ce5b00;">
+<strong>IMPORTANT.</strong>
+</p>
+<p>
+The <em>M</em>-estimators are of type RML II in the sense of <a href="#biblio">Richardson and Welsh (1995)</a>; see <a href="#biblio">Schoch, (2012)</a>. The robust estimators of <a href="#biblio">Sinha and Rao, 2009</a> are <strong>not</strong> RML II estimators. Therefore, the methods of this package <strong>do not</strong> compute the estimators of <a href="#biblio">Sinha and Rao, 2009</a>.
+</p>
+</div>
 <p>This vignette is organized as follows:</p>
 <ul>
 <li>1 Getting started</li>
@@ -533,6 +541,7 @@ summary {
 <li>3 Setting up the model</li>
 <li>4 Parameter estimation</li>
 <li>5 Robust prediction of the area-level means</li>
+<li>6 Mean square error estimation</li>
 </ul>
 <div class="my-sidebar-blue">
 <p style="color: #1f618d;">
@@ -624,12 +633,11 @@ No. of areas:  12
 No. of obs.:  36 
 Smallest area:  1  units 
 Largest area:  5  units </code></pre>
-<p>The important thing to note is that <code>summary()</code> reminds you of the fact that the model was generated using only non-outlying observations.</p>
 </div>
 <div id="parameter-estimation" class="section level2">
 <h2>4 Parameter estimation</h2>
 <p>Having set up our model, we consider estimating the parameters of the Gaussian core model by different methods. All fitting is done using the following workhorse function</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">fitsaemodel</span>(method, model, ...)</span></code></pre></div>
+<pre><code>fitsaemodel(method, model, ...)</code></pre>
 <p>Depending on the arguments delivered, <code>fitsaemodel</code> decides what method to use. The decision is based on the <code>method</code> argument.</p>
 <div id="maximum-likelihood-estimation" class="section level3">
 <h3>4.1 Maximum-likelihood estimation</h3>
