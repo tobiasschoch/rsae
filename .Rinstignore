@@ -4,6 +4,7 @@
 ^\.gitattributes$
 ^\.gitignore$
 ^README\.md$
+^inst/TODO$
 # varia
 ^inst/varia$
 # license (used for GitHub)
