@@ -16,11 +16,16 @@ NeedsCompilation: yes
 URL: https://github.com/tobiasschoch/rsae
 BugReports: https://github.com/tobiasschoch/rsae/issues
 Encoding: UTF-8
+NeedsCompilation: yes
+LazyData: true
 Depends:
     R (>= 3.5.0)
 Imports:
 	stats,
     graphics
 Suggests:
+    knitr,
+    rmarkdown,
     robustbase,
     nlme
+VignetteBuilder: knitr, rmarkdown

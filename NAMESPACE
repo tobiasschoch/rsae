@@ -28,6 +28,5 @@ S3method(residuals, meanssaemodel)
 export(convergence)
 export(makedata)
 
-
 #register the dll
 useDynLib(rsae, .registration = TRUE)

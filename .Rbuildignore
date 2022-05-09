@@ -9,3 +9,5 @@
 ^inst/varia$
 # license (used for GitHub)
 ^LICENSE
+# vignettes
+^vignettes/my_Makefile$

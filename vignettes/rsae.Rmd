@@ -94,7 +94,7 @@ install.packages("rsae")
 Once the `rsae` package has been installed, we need to load it to the current session by
 
 ```{r}
-library(rsae)
+library("rsae")
 ```
 
 <div class="my-sidebar-blue">
@@ -114,13 +114,10 @@ These steps will be discussed in subsequent sections.
 
 ## 2 Exploring the data
 
-First of all, we have to set up a model. We use the `landsat` data from [Battese et al (1988)](#biblio), the landmark paper on the basic unit-level SAE model (here: units = segments, each about 250 hectares; areas = Counties).
-
-
-First, we have to load the `landsat` data into the workspace.
+First of all, we have to set up a model. We use the `landsat` data from [Battese et al (1988)](#biblio), the landmark paper on the basic unit-level SAE model (here: units = segments, each about 250 hectares; areas = Counties). First, we have to load the `landsat` data into the workspace.
 
 ```{r}
-data(landsat)
+data("landsat")
 ```
 
 Next, we will explore the data. The `names` command reports the names of the variables in the `landsat` data.
@@ -131,14 +128,11 @@ names(landsat)
 
 Get a table (i.e., an aggregation) of the variable CountyName.
 
-
 ```{r}
 table(landsat$CountyName)
 ```
 
-So, there are twelve areas -- the smallest areas (Cerro Gordo, Hamilton, and Worth) contain one unit, the largest area, Hardin, involves six units.
-
-Next, we want to have a look at observations no. 30 to 35 and some interesting variables.
+So, there are twelve areas -- the smallest areas (Cerro Gordo, Hamilton, and Worth) contain one unit, the largest area, Hardin, involves six units. Next, we want to have a look at observations no. 30 to 35 and some interesting variables.
 
 ```{r}
 landsat[30:35, c("HACorn", "PixelsCorn", "PixelsSoybeans", "CountyName",
@@ -213,13 +207,11 @@ summary(mlfit)
 ```
 
 
-
-
-**FIXME**: coef 
+**FIXME**: coef
 
 <div class="my-sidebar-orange">
 <p style="color: #ce5b00;">
-**IMPORTANT. The estimator does not converge**
+**IMPORTANT. What if the algorithm does not converge**
 </p>
 
 ```{r, echo = FALSE}
@@ -230,7 +222,7 @@ we follow the hint and call the `convergence()` method:
 ```{r, echo = FALSE}
 convergence(est)
 ```
-Now, it may happen that the ML-method of `fitsaemodel()` does not converge (even if the parameters have not been modified). A remedy is to initialize the ML method by a regression $S$-estimator (sic!), calling `fitsaemodel()` with `init = "s"`. Obviously, this approach is not optimal in terms of computing time. Nonetheless, by this specification, `fitsaemodel()` enters the "safe mode" of robust Huber-type *M*-estimation and applies several checks whether the algorithm behaves well (these checks are ignored in the default mode).
+Now, it may happen that the ML-method of `fitsaemodel()` does not converge (even if the parameters have not been modified). A remedy is to initialize the ML method by a regression $S$-estimator, calling `fitsaemodel()` with `init = "s"`. Obviously, this approach is not optimal in terms of computing time. Nonetheless, by this specification, `fitsaemodel()` enters the "safe mode" of robust Huber-type *M*-estimation and applies several checks whether the algorithm behaves well (these checks are ignored in the default mode).
 
 It consist of the following blocks:
 
@@ -238,7 +230,6 @@ It consist of the following blocks:
 * Block 2 reports the number of iterations that each of the estimating equation--specific (EE-specific) loops (aka inner loops) and the overall loop (aka outer loop) used to conform to the termination rule. Each row in the table represents a single run of the overall loop. In the example, the algorithm needed 7 overall loops. The entries of a row refer to the EE-specific number of iterations in a particular overall loop.  It is evident that the number of (inner-loop) iterations for `fixeff` and `residual var` become smaller, the higher the number of outer/overall loops. This is not (and will never be) the case for `area raneff var` because it is obtained using a different optimization method. In general, we can feel confident if the number of inner-loop iterations decrease (in the case of `fixeff` and `residual var`). However, there are situations where the algorithm converges perfectly without featuring such a nice decrease in the number of inner-loop iterations.
 </p>
 </div>
-
 
 <div class="my-sidebar-blue">
 <p style="color: #1f618d;">
@@ -267,7 +258,6 @@ fitsaemodel("ml", m)
 The report indicates that the random-effect variance is close to zero or equal to zero. Therefore, the MLM model is not appropriate.
 </p>
 </div>
-
 
 ## 4.2 Huber-type *M*-estimation
 
@@ -310,7 +300,6 @@ In addition, the `convergence()` method supplies us with a report on the converg
 
 The safe mode should be used when the data are supposed to be moderately contaminated and/or the algorithm in default mode failed to converge. The safe-mode algorithm is initialized by a high-breakdown-point regression estimator. However, it is only safe up to a certain degree of contamination (i.e., breakdown-point is rather low for *M*-estimators). In the presence of too many outliers, the *M*-estimator will break down.
 
-
 <div class="my-sidebar-orange">
 <p style="color: #ce5b00;">
 **IMPORTANT.**
@@ -324,7 +313,6 @@ The safe mode is entered if one specifies (in `fitsaemodel()`) either:
 
 * `init = "lts"` for initializing the method by a fast-LTS regression estimator [Rousseeuw, 1984](#biblio);[Rousseeuw and van Driessen, 2006](#biblio)),
 * `init = "s"` for initializing the method by a regression *S*-estimator ([Rousseeuw and Yohai, 1984](#biblio);[Salibian-Bbarerra and Yohai, 2006](#biblio)).
-
 
 Also, the safe mode uses a couple of tests to check whether the estimates at consecutive iterations behave well. Notably, it prevents cycling estimates (i.e., the situation when the algorithm is trapped in a flip-flop), which typically occurs for very small robustness-tuning constants).
 
@@ -375,7 +363,6 @@ The first column of `d` is a dummy variable (the `bhfmodel` has an intercept ter
 
 Next, we consider predicting the random and fixed effects and the county means. Note that we do not explicitly specify `k`. This means that the procedure uses the same `k` as the one that has been used for robust estimation (here, the model has been estimated by `method = "ml"` which is equivalent to $k=\infty$). MSPE is obtained using 500 bootstrap replicates.
 
-
 ```{r}
 pr <- robpredict(mlfit, areameans = d, reps = 100)
 ```
@@ -416,37 +403,36 @@ qqnorm(res)
 qqline(res)
 ```
 
-
 ---
 
 ## References {#biblio}
 
-Copt, S. and M.-P. Victoria-Feser (2009). *Robust Predictions in Mixed Linear Models*. Research Report, University of Geneva.
+COPT, S. AND M.-P. VICTORIA-FESER (2009). *Robust prediction in mixed linear models*, Tech. rep., University of Geneva.
 
-Battese, G.E., R.M. Harter, and W.A. Fuller (1988). An Error-Components Model for Prediction of County Crop Areas Using Survey and Satellite Data. *Journal of the American Statistical Association* 83, pp. 28-36.
+BATTESE, G. E., R. M. HARTER, AND W. A. FULLER (1988). An error component model for prediction of county crop areas using, *Journal of the American Statistical Association* **83**, 28--36.
 
-Fellner, W. (1986). Robust estimation of variance components. *Technometrics* 28, pp. 51-60.
+FELLNER, W. H. (1986). Robust estimation of variance components, *Technometrics* **28**, 51--60.
 
-Heritier, S., E. Cantoni, S. Copt, and M.-P. Victoria-Feser (2009). *Robust methods in Biostatistics*. New York: John Wiley and Sons.
+HERITIER, S., E. CANTONI, S. COPT, AND M.-P. VICTORIA-FESER (2009). *Robust Methods in Biostatistics*, New York: John Wiley & Sons.
 
-Rao, J.N.K. (2003). *Small Area Estimation*, New York: John Wiley and Sons.
+MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO AND M. A. DI PALMA (2021). *robustbase: Basic Robust Statistics*. R package version 0.93-9. URL http://CRAN.R-project.org/package=robustbase.
 
-Richardson, A.M. (1997). Bounded Influence Estimation in the Mixed Linear Model. *Journal of the American Statistical Association* 92, pp. 151-161.
+RAO, J.N.K. (2003). *Small Area Estimation*, New York: John Wiley and Sons.
 
-Richardson, A.M. (1995). *Some problems in estimation in mixed linear models*. PhD thesis, Australian National University.
+RICHARDSON, A. M. (1995). *Some problems in estimation in mixed linear models*, Ph.D. thesis, Australian National University.
 
-Richardson, A.M. and A.H. Welsh (1995): Robust restricted maximum likelihood in mixed linear model. *Biometrics* 51, pp. 1429-1439.
+RICHARDSON, A. M. (1997). Bounded Influence Estimation in the Mixed Linear Model, *Journal of the American Statistical Association* **92**, 151--161.
 
-Rousseeuw, P.J. (1984). Least Median of Squares Regression. *Journal of the American Statistical Association* 79, pp. 871-880.
+RICHARDSON, A. M. AND A. H. WELSH (1995). Robust Restricted Maximum Likelihood in Mixed Linear Models, *Biometrics* **51**, 1429--1439.
 
-Rousseeuw, P.J. and V.J. Yohai (1984). *Robust regression by means of S-estimators*, in: Robust and Nonlinear Time Series, Franke, J., W. Härdle, and R.D. Martin (eds.), Lecture Notes in Statistics 26, pp. 256-272, New York: Springer.
+ROUSSEEUW, P. J. (1984). Least Median of Squares Regression, *Journal of the American Statistical Association* **79**, 871--880.
 
-Rousseeuw, P.J. and K. van Driessen (2006). Computing LTS Regression for Large Data Sets, *Data Mining and Knowledge Discovery* 12, pp. 29-45.
+ROUSSEEUW, P. J. AND K. VAN DRIESSEN (2006). Computing LTS Regression for Large Data Sets, *Data Mining and Knowledge Discovery* **12**, 29--45.
 
-Rousseeuw, P.J., C. Croux, V. Todorov, A. Ruckstuhl, M. Salibian-Barrera, T. Verbeke, M. Koller, M. Maechler (2011). *robustbase: Basic Robust Statistics*. R package version 0.7-6. URL http://CRAN.R-project.org/package=robustbase.
+ROUSSEEUW, P. J. AND V. YOHAI (1984). Robust Regression by Means of S Estimators, in *Robust and Nonlinear Time Series Analysis*, ed. by FRANKE, J., W. HÄRDLE AND R. D. MARTIN, New York: Springer, 256--274.
 
-Salibian-Barrera, M. and V.J. Yohai (2006). A fast algorithm for S-regression estimates. *Journal of Computational and Graphical Statistics* 15, pp. 414-427.
+SALIBIAN-BARRERA, M. AND V. J. YOHAI (2006). A Fast Algorithm for S-Regression Estimates, *Journal of Computational and Graphical Statistics* **15**, 414--427.
 
-Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* 41(4), pp. 243-265.
+SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* **41**, 243--265.
 
-Sinha, S.K. and J.N.K. Rao (2009). Robust small area estimation. *Canadian Journal of Statistics* 37, pp. 381-399.
+SINHA, S.K. AND J.N.K. RAO (2009). Robust small area estimation. *Canadian Journal of Statistics* **37**, 381--399.
