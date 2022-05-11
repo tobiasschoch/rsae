@@ -3,14 +3,12 @@
 \alias{print.saemodel}
 \alias{summary.saemodel}
 \alias{as.matrix.saemodel}
-\title{
-Setting Up a SAE Model
-}
+\title{Setting Up a SAE Model}
 \description{
-\code{saemodel} is the workhorse function to set up a model (i.e., an
-instance of the \code{"saemodel"} class). It is the starting point of
-every model fitting exercise. Once a model has been initilized/ set up,
-we consider estimating its parameter.
+    \code{saemodel} is the workhorse function to set up a model (i.e., an
+    instance of the \code{"saemodel"} class). It is the starting point of
+    every model fitting exercise. Once a model has been initilized/ set up,
+    we consider estimating its parameter.
 }
 \usage{
 saemodel(formula, area, data, type = "b", na.omit = FALSE)
@@ -41,21 +39,20 @@ saemodel(formula, area, data, type = "b", na.omit = FALSE)
     \item{\dots}{not used.}
 }
 \details{
-The step of setting up a SAE model is the starting point of any (robust)
-SAE modeling exercise. (Use the makedata to generate a synthetic
-dataset; see also, below). Here, we have to define the fixed-effects-
-and random-effects part of the model, and to tell \code{R} what data
-it shall use.
+    The step of setting up a SAE model is the starting point of any (robust)
+    SAE modeling exercise. (Use the makedata to generate a synthetic
+    dataset; see also, below). Here, we have to define the fixed-effects-
+    and random-effects part of the model, and to tell \code{R} what data
+    it shall use.
 
-Once a model has been initilized/ set up, we consider estimating its
-parameter; see \code{\link{fitsaemodel}}.
+    Once a model has been initilized/ set up, we consider estimating its
+    parameter; see \code{\link{fitsaemodel}}.
 }
 \value{
-Instance of the S3 class \code{"saemodel"}.
+    Instance of the S3 class \code{"saemodel"}.
 }
 \references{
-Rao, J.N.K. (2003).
-    \emph{Small Area Estimation}, New York: John Wiley and Sons.
+Rao, J.N.K. (2003). \emph{Small Area Estimation}, New York: John Wiley and Sons.
 }
 \seealso{
 \code{\link{makedata}}

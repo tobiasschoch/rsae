@@ -1,11 +1,9 @@
 \name{fitsaemodel.control}
 \alias{fitsaemodel.control}
-\title{
-Tuning Parameters of \code{fitsaemodel}
-}
+\title{Tuning Parameters of \code{fitsaemodel}}
 \description{
-This function is used to define global settings and parameters that
-are used by \code{fitsaemodel}.
+    This function is used to define global settings and parameters that
+    are used by \code{fitsaemodel}.
 }
 \usage{
 fitsaemodel.control(niter = 40, iter = c(200, 200), acc = 1e-05,
@@ -47,11 +45,11 @@ fitsaemodel.control(niter = 40, iter = c(200, 200), acc = 1e-05,
     \item{\dots}{(may be used in the future).}
 }
 \details{
-Changing the default values of the parameters may result in failure of
-convergence or loss of convergence speed.
+    Changing the default values of the parameters may result in failure of
+    convergence or loss of convergence speed.
 }
 \value{
-(an object used by the robust methods)
+    (an object used by the robust methods)
 }
 \seealso{
 \code{\link{fitsaemodel}}
