@@ -1,51 +1,36 @@
 robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL)
 {
     if (!inherits(fit, "fitsaemodel"))
-        stop("fit must be of class 'fitsaemodel'")
-    # get the modelk
-    modelk <- attr(fit, "method")$tuning$k
-    # get the decomposition
-    dec <- attr(fit, "dec")
-    # for ml, modelk = 20000
-    if (is.null(modelk))
-        modelk <- 20000
-    # prediction k (which is not necessarily equal to modelk)
+        stop("fit must be of class 'fitsaemodel'", call. = FALSE)
+
+    model <- attr(fit, "saemodel")          # sae model
+    dec <- attr(fit, "dec")                 # type of decomposition
+    k_fit <- attr(fit, "method")$tuning$k   # tuning constant of fitted model
+    if (is.null(k_fit))
+        k_fit <- fitsaemodel.control()$k_Inf
+
+    # tuning constant k for prediction (not necessarily equal to k_fit)
     if (is.null(k))
-        k <- modelk # here: k == modelk
+        k <- k_fit
     else
-        if (k <= 0 )
-            stop("Robustness tuning constant k must be > 0!\n")
-    kappa <- .computekappa(k)
-    # initialize
-    mspe <- NULL
-    # from the model definitions; used in order to compute the random effects
-    model <- attr(fit, "saemodel")
-    areaNames <- attr(model, "areaNames")
-    x <- model$X
-    y <- model$y
-    n <- model$n
-    p <- model$p
-    g <- model$g
-    nsize <- model$nsize
-    # from the fitted model
-    beta <- fit$beta
-    v <- fit$theta[1]
+        stopifnot(is.numeric(k), k > 0, is.finite(k))
+    kappa <- .computekappa(k)               # consistency correction
+    v <- fit$theta[1]                       # variance components
     d <- fit$theta[2] / v
-    # tau
-    tau <- c(beta, v, d)
+
     # preparations for fortran-call
-    predre <- rep(0, g)
-    predfe <- rep(0, g)
-    tmp <- .Fortran("drsaehubpredict", n = as.integer(n), p = as.integer(p),
-        g = as.integer(g), nsize = as.integer(nsize), k = as.double(k),
+    predre <- predfe <- rep(0, model$g)
+    tmp <- .Fortran("drsaehubpredict", n = as.integer(model$n),
+        p = as.integer(model$p), g = as.integer(model$g),
+        nsize = as.integer(model$nsize), k = as.double(k),
         kappa = as.double(kappa), d = as.double(d), v = as.double(v),
-        beta = as.matrix(beta), yvec = as.matrix(y), xmat = as.matrix(x),
-        predfe = as.matrix(predfe), predre = as.matrix(predre),
-        dec = as.integer(dec), PACKAGE = "rsae")
-    # retrieve the area-level random effects; it is used whether new data
-    # is present or not
+        beta = as.matrix(fit$beta), yvec = as.matrix(model$y),
+        xmat = as.matrix(model$X), predfe = as.matrix(predfe),
+        predre = as.matrix(predre), dec = as.integer(dec), PACKAGE = "rsae")
+    # predicted area-level random effects
     raneff <- tmp$predre
     # branch: old vs new data
+    mspe <- NULL
     if (is.null(areameans)) {
         fixeff <- as.matrix(tmp$predfe)
     } else {
@@ -53,28 +38,30 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL)
         if (!is.matrix(areameans))
             areameans <- as.matrix(areameans)
         # check the dimensions
-        if (dim(areameans)[1] != g)
+        if (!all(dim(areameans) == c(model$g, model$p)))
             stop("'areameans' is not of conformable size! \n")
-        if (dim(areameans)[2] != p)
-            stop("'areameans' is not of conformable size! \n")
-        # compute the fixed-effect spredictions (at the area level)
-        fixeff <- areameans %*% beta
-        # compute mspe, given the fitted model (this option is only valid
-        #if areameans != NULL
-        if (!is.null(reps))
-            mspe <- .mspe(fit, abs(round(reps)), areameans, fixeff)
+        # compute the fixed-effect predictions (at the area level)
+        fixeff <- areameans %*% fit$beta
+        # compute mean square prediction error (bootstrap)
+        if (!is.null(reps)) {
+            stopifnot(is.numeric(reps), reps > 0)
+            mspe <- .mspe(fit, as.integer(reps), areameans, fixeff)
+        }
     }
+    rownames(fixeff) <- attr(model, "areaNames")
+    rownames(raneff) <- rownames(fixeff)
     means <- raneff + fixeff
-    rownames(fixeff) <- areaNames
-    rownames(raneff) <- areaNames
-    rownames(means) <- areaNames
+
     # compute the residuals of the model (i.e. e_ij = y_ij - X_ij*beta - u_i)
-    vn <- numeric(n)
-    getres <- .Fortran("drsaeresid", n = as.integer(n), p = as.integer(p),
-        g = as.integer(g), nsize = as.integer(nsize), k = as.double(modelk),
-        tau = as.matrix(tau), u = as.matrix(raneff), xmat = as.matrix(x),
-        yvec = as.matrix(y), res = as.matrix(vn), stdres = as.matrix(vn),
+    tau <- c(fit$beta, v, d)
+    vn <- numeric(model$n)
+    getres <- .Fortran("drsaeresid", n = as.integer(model$n),
+        p = as.integer(model$p), g = as.integer(model$g),
+        nsize = as.integer(model$nsize), k = as.double(k_fit),
+        tau = as.matrix(tau), u = as.matrix(raneff), xmat = as.matrix(model$X),
+        yvec = as.matrix(model$y), res = as.matrix(vn), stdres = as.matrix(vn),
         wgt = as.matrix(vn), dec = as.integer(dec), PACKAGE = "rsae")
+
     result <- list(fixeff = fixeff, raneff = raneff, means = means,
         res = getres$res, stdres = getres$stdres, wgt = getres$wgt,
         mspe = mspe)
@@ -82,18 +69,15 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL)
     attr(result, "fit") <- fit
     attr(result, "mspe") <- reps
     class(result) <- "meanssaemodel"
-    return(result)
+    result
 }
 # S3 plot method
 plot.meanssaemodel <- function(x, y = NULL, type = "e", sort = NULL, ...)
 {
     # y is part of the generic (later, we will use y to allow plot comparison)
-    # extract robustness tuning constant
-    k <- attr(x, "robustness")
     fe <- x$fixeff
     re <- x$raneff
     means <- x$means
-    g <- length(re)
     areaNames <- rownames(re)
     mspe <- x$mspe
     # sorting
@@ -108,6 +92,7 @@ plot.meanssaemodel <- function(x, y = NULL, type = "e", sort = NULL, ...)
             mspe <- mspe[ord]
     }
     # prepare the plot
+    g <- length(re)
     at <- 1:g
     # without mspe
     if (is.null(mspe)) {
@@ -133,7 +118,6 @@ plot.meanssaemodel <- function(x, y = NULL, type = "e", sort = NULL, ...)
             bg = "white", ncol = 2)
     } else {
         # with mspe
-        # check type
         if (is.na(match(type, c("e", "l"))))
             stop("plot type must be either 'e' or 'l' \n")
         # compute plotting range
@@ -160,24 +144,23 @@ plot.meanssaemodel <- function(x, y = NULL, type = "e", sort = NULL, ...)
     }
 }
 # S3 print method
-print.meanssaemodel <- function(x, digits = 4, ...)
+print.meanssaemodel <- function(x, digits = max(3L, getOption("digits") - 3L),
+    ...)
 {
     cat("Robustly Estimated/Predicted Area-Level Means:\n")
-    hasmspe <- attr(x, "mspe")
-    if (is.null(hasmspe)) {
-        all <- cbind(x$raneff, x$fixeff, x$means)
-        colnames(all) <- c("raneff", "fixeff", "predicted mean")
-    } else {
-        all <- cbind(x$raneff, x$fixeff, x$means, x$mspe)
-        colnames(all) <- c("raneff", "fixeff", "area mean", "MSPE")
-    }
+
+    all <- cbind(x$raneff, x$fixeff, x$means, x$mspe)
+    colnames(all) <- if (is.null(x$mspe))
+        c("raneff", "fixeff", "area mean")
+    else
+        c("raneff", "fixeff", "area mean", "MSPE")
+
     print.default(format(all, digits = digits), print.gap = 2, quote = FALSE)
-    if (!is.null(hasmspe))
-        cat(paste("(MSPE: ", hasmspe," boostrap replicates)\n", sep = ""))
+    if (!is.null(x$mspe))
+        cat("(MSPE:", attr(x, "mspe"), "boostrap replicates)\n")
 }
 # S3 residual method to extract residuals
 residuals.meanssaemodel <- function(object, ...)
 {
-    res <- object$res
-    return(res)
+    object$res
 }

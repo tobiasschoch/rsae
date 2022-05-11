@@ -17,7 +17,8 @@ not the method of Sinha and Rao (2009).
 \usage{
 robpredict(fit, areameans = NULL, k = NULL, reps = NULL)
 
-\method{print}{meanssaemodel}(x, digits = 4, ...)
+\method{print}{meanssaemodel}(x, digits = max(3L, getOption("digits") - 3L),
+    ...)
 \method{plot}{meanssaemodel}(x, y = NULL, type = "e", sort = NULL, ...)
 \method{residuals}{meanssaemodel}(object, ...)
 }

@@ -9,7 +9,7 @@
     eps <- .Machine$double.eps
     # switch method
     if (method == "ml") {
-        k <- rep(control$maxk, 3)
+        k <- rep(control$k_Inf, 3)
         k.report <- k[1]
         kappa <- rep(1.0, 2)
         methodName <- list(type = "Maximum likelihood estimation")

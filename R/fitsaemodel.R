@@ -1,25 +1,16 @@
+# workhorse function
 fitsaemodel <- function(method, model, ...)
 {
-    thecall <- match.call() #FIXME:
-    # check if model is appropriate
-    if (inherits(model, "saemodel")) {
-        # check if method exists
-        # FIXME: match.arg()
-        m <- match(method, c("ml", "huberm", "tukeys"))
-        if (is.na(m))
-            stop(paste("Method: ", method, " is not supported! \n", sep = ""))
-        # ml and huberm
-        # FIXME: switch
-        if (m == 1 | m == 2)
-            tmp <- .fitsaemodel.huberm(method, model, ...)
-        # tukeys
-        if (m == 3)
-            stop("Tukey S-estimator not implemented, yet!\n")
-    } else {
-        stop(paste("Model", thecall[3],
-            "must be an instance of 'saemodel' class.\n"))
-    }
-    tmp
+    if (!inherits(model, "saemodel"))
+        stop("Argument 'model' must be an object of class 'saemodel'\n",
+             call. = FALSE)
+
+    method <- match.arg(method, c("ml", "huberm", "tukeys"))
+    if (method == "tukeys")
+        stop("Tukey S-estimator not implemented yet!\n")
+    else
+        .fitsaemodel.huberm(method, model, ...)
+
 }
 # control function used in fitsaemodel
 fitsaemodel.control <- function(niter = 40, iter = c(200, 200), acc = 1e-5,
@@ -40,7 +31,7 @@ fitsaemodel.control <- function(niter = 40, iter = c(200, 200), acc = 1e-5,
         "default" = 0,
         "lts" = 1,
         "s" = 2)
-    list(niter = niter, iter = iter, acc = acc, maxk = k_Inf, init = init,
+    list(niter = niter, iter = iter, acc = acc, k_Inf = k_Inf, init = init,
         dec = dec, decorr = decorr, add = list(...))
 }
 # S3 print method
