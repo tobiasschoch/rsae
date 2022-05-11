@@ -227,37 +227,3 @@
     }
     return(result)
 }
-
-.mspe <- function(fit, reps, areameans, fixeff)
-{
-    # fitted-model attrs
-    # as scale not variance, since rnorm wants it like that
-    theta <- sqrt(fit$theta)
-    beta <- fit$beta
-    # model attrs
-    model <- attr(fit, "saemodel")
-    X <- as.matrix(model$X)
-    Xbeta <- X %*% beta
-    n <- model$n
-    g <- model$g
-    nsize <- model$nsize
-    predicts <- matrix(NA, reps, g)
-    for (j in 1:reps) {
-        # draw model error, e
-        e <- rnorm(n, 0, theta[1])
-        # draw raneff, v
-        v <- unlist(sapply(nsize, function(u) rep(rnorm(1, 0, theta[2]), u),
-            simplify = TRUE))
-        # modify pred (add random effec)
-        predrf <- fixeff +  (unique(v))# * as.double(nsize))
-        # generate bootstrap samples (and fix it to the model)
-        model$y <- Xbeta + e + v
-        # compute the model parameters using ml
-        tmp <- fitsaemodel("ml", model)
-        # predict
-        predicts[j, ] <- t(robpredict(tmp, areameans, k = 20000,
-            reps = NULL)$means) - t(predrf)
-    }
-    res <- colMeans(predicts^2)
-    return(res)
-}

@@ -71,6 +71,31 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL)
     class(result) <- "meanssaemodel"
     result
 }
+# Bootstrap
+.mspe <- function(fit, reps, areameans, fixeff)
+{
+    theta <- sqrt(fit$theta)
+    model <- attr(fit, "saemodel")
+    Xbeta <- as.matrix(model$X) %*% fit$beta
+    predicts <- matrix(NA_real_, reps, model$g)
+    for (j in 1:reps) {
+        # draw model error, e
+        e <- rnorm(model$n, 0, theta[1])
+        # draw raneff, v
+        v <- unlist(sapply(model$nsize, function(u) rep(rnorm(1, 0,
+            theta[2]), u), simplify = TRUE))
+        # modify pred (add random effec)
+        predrf <- fixeff + unique(v)
+        # generate bootstrap samples (and fix it to the model)
+        model$y <- Xbeta + e + v
+        # compute the model parameters using ml
+        tmp <- fitsaemodel("ml", model)
+        # predict
+        predicts[j, ] <- t(robpredict(tmp, areameans, k = 20000,
+            reps = NULL)$means) - t(predrf)
+    }
+    colMeans(predicts^2)
+}
 # S3 plot method
 plot.meanssaemodel <- function(x, y = NULL, type = "e", sort = NULL, ...)
 {
