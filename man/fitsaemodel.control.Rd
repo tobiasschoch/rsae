@@ -9,7 +9,7 @@ are used by \code{fitsaemodel}.
 }
 \usage{
 fitsaemodel.control(niter = 40, iter = c(200, 200), acc = 1e-05,
-    dec = 0, decorr = 0, init = "default", ...)
+    dec = 0, decorr = 0, init = "default", k_Inf = 20000, ...)
 }
 \arguments{
     \item{niter}{integer that defines the maximum number of outer-loop
@@ -42,11 +42,13 @@ fitsaemodel.control(niter = 40, iter = c(200, 200), acc = 1e-05,
         rather slow. For more details on the initializing methods, see the
         documentation of \pkg{robustbase} (\code{"ltsReg"} and
         \code{"lmrob.S"}).}
+    \item{k_Inf}{tuning constant that represents infinity (default:
+        \code{k_Inf = 20000}).}
     \item{\dots}{(may be used in the future).}
 }
 \details{
-Attention! Changing the default values of the parameters may result in
-failure of convergence or loss of convergence speed.
+Changing the default values of the parameters may result in failure of
+convergence or loss of convergence speed.
 }
 \value{
 (an object used by the robust methods)

@@ -1,4 +1,4 @@
-# CHANGES in rsae VERSION 0.1-6 (2021-06-20)
+# CHANGES in rsae VERSION 0.1-6 (2022-05-11)
 
 ## BUG FIXES
 
@@ -6,6 +6,11 @@
 * fixed DESCRIPTION file
 * replaced `require()` in function `.initmethod()` with
     `requireNamespace()`
+
+## CHANGES
+
+* `coef()` method for objects of class `fitsaemodel` only returns the coefficients but does print to the console anymore 
+* `fitsaemodel.control()` gained the additional argument `k_Inf` to specify the robustness tuning constant k that represents infinity (used to define the maximum likelihood estimator)
 
 ## MISC
 

@@ -1,6 +1,6 @@
 fitsaemodel <- function(method, model, ...)
 {
-    thecall <- match.call()
+    thecall <- match.call() #FIXME:
     # check if model is appropriate
     if (inherits(model, "saemodel")) {
         # check if method exists
@@ -22,10 +22,12 @@ fitsaemodel <- function(method, model, ...)
     tmp
 }
 # control function used in fitsaemodel
-#FIXME: add tuning consant for robust initialization as an argument
 fitsaemodel.control <- function(niter = 40, iter = c(200, 200), acc = 1e-5,
-    dec = 0, decorr = 0, init = "default", ...)
+    dec = 0, decorr = 0, init = "default", k_Inf = 20000, ...)
 {
+    stopifnot(all(acc > 0), all(iter > 0), length(niter) == 1, niter > 0,
+        dec %in% c(0, 1), decorr %in% c(0, 1), k_Inf > 0, is.finite(k_Inf))
+
     # define acc
     if (length(acc) != 4)
         acc = rep(acc, 4)
@@ -33,26 +35,16 @@ fitsaemodel.control <- function(niter = 40, iter = c(200, 200), acc = 1e-5,
     if (length(iter) != 2)
         iter = rep(iter[1], 2)
 
-    # implicitly check for postitivity
-    #FIXME: move abs checks down to the return list
-    acc = abs(acc)
-    iter = abs(iter)
-    niter = abs(niter[1])
-    # define maxk (define ml method)
-    maxk = 20000
-    # machine eps
-    eps <- .Machine$double.eps^(1 / 4)
     # make them all positive
-    init <- switch(init, "default" = 0, "lts" = 1, "s" = 2)
-    # define decomposition of the matrix-squareroot (0=SVD; 1=Cholesky)
-    dec <- ifelse(dec == 0, 0, 1)
-    # robustly decorrelate (center by median instead of the mean)
-    decorr <- ifelse(decorr == 0, 0, 1)
-    res = list(niter = niter, iter = iter, acc = acc, maxk = maxk, init = init,
+    init <- switch(match.arg(init, c("default", "lts", "s")),
+        "default" = 0,
+        "lts" = 1,
+        "s" = 2)
+    list(niter = niter, iter = iter, acc = acc, maxk = k_Inf, init = init,
         dec = dec, decorr = decorr, add = list(...))
-    return(res)
 }
 # S3 print method
+#FIXME:
 print.fitsaemodel <- function (x, digits = 6, ...)
 {
     saemodel <- attr(x, "saemodel")
@@ -122,94 +114,76 @@ print.fitsaemodel <- function (x, digits = 6, ...)
     invisible(x)
 }
 # S3 summary method
+#FIXME: + digits ; see https://github.com/wch/r-source/blob/trunk/src/library/stats/R/lm.R
 summary.fitsaemodel <- function (object, digits = 6, ...)
 {
-    saemodel <- attr(object, "saemodel")
-    n <- saemodel$n
-    g <- saemodel$g
-    p <- saemodel$p
-    fixeffnames <- attr(saemodel, "xnames")
-    # retrieve the estimating method
-    method <- attr(object, "method")
-    # check whether the model converged
-    converged <- object$converged
-    if (converged != 1) {
-        cat("ALGORITHM FAILED TO CONVERGE! use convergence() to learn more \n")
-    } else {
-        cat("ESTIMATION SUMMARY \n")
-        cat("Method: ", method$type, "\n")
-        # branch: robust vs. non-robust methods
-        if (length(method) > 1) {
-            tuning <- method$tuning
-            if (length(tuning) == 1) {
-                cat(paste("Robustness tuning constant: ", names(tuning), " = ",
-                    as.numeric(tuning), "\n"))
-            } else {
-                for (i in 1:length(tuning))
-                    cat(tuning[i], "\n")
-            }
-        }
-        #----------------------
-        # fixed effects table
-        df <- n - g - p + 1
-        fixed <- object$beta
-        stdfixed <- sqrt(diag(object$vcovbeta))
-        tTable <- cbind(fixed, stdfixed, fixed / stdfixed, df, fixed)
-        colnames(tTable) <- c("Value", "Std.Error", "t-value", "df", "p-value")
-        rownames(tTable) <- fixeffnames
-        tTable[, 5] <- 2 * pt(-abs(tTable[, 3]), tTable[, 4])
-        cat("---\n")
-        cat("Fixed effects\n")
-        printCoefmat(tTable, digits = digits, P.values = TRUE,
-            has.Pvalue = TRUE)
+    # failure of convergence
+    if (object$converged != 1) {
+        cat("ALGORITHM FAILED TO CONVERGE! use convergence() to learn more\n")
+        return()
+    }
 
-        #----------------------
-        # robustness properties
-        wgt <- attr(object, "robustness")$wgt
-        # branch robust vs non-robust
-        if (!is.null(wgt)) {
-            wgt <- t(wgt) / n
-            colnames(wgt) <- c("fixeff", "residual var", "area raneff var")
-            rownames(wgt) <- "sum(wgt)/n"
-            cat("---\n")
-            cat("Degree of downweighting/winsorization:\n")
-            cat("\n")
-            print.default(format(t(wgt), digits = digits), print.gap = 2,
-                quote = FALSE)
+    # otherwise
+    cat("ESTIMATION SUMMARY\n")
+    method <- attr(object, "method")
+    cat("Method: ", method$type, "\n")
+    # branch: robust vs. non-robust methods
+    if (length(method) > 1) {
+        tuning <- method$tuning
+        if (length(tuning) == 1) {
+            cat(paste("Robustness tuning constant: ", names(tuning), " = ",
+                as.numeric(tuning), "\n"))
+        } else {
+            for (i in 1:length(tuning))
+                cat(tuning[i], "\n")
         }
     }
+    #----------------------
+    # fixed effects table
+    saemodel <- attr(object, "saemodel")
+    df <- saemodel$n - saemodel$g - saemodel$p + 1
+    fixed <- object$beta
+    stdfixed <- sqrt(diag(object$vcovbeta))
+    tTable <- cbind(fixed, stdfixed, fixed / stdfixed, df, fixed)
+    colnames(tTable) <- c("Value", "Std.Error", "t-value", "df", "p-value")
+    rownames(tTable) <- attr(saemodel, "xnames")
+    # p-value
+    tTable[, 5] <- 2 * pt(-abs(tTable[, 3]), tTable[, 4])
+    cat("---\nFixed effects\n")
+    printCoefmat(tTable, digits = digits, P.values = TRUE, has.Pvalue = TRUE)
+    #----------------------
+    # robustness properties (only for robust methods)
+    wgt <- attr(object, "robustness")$wgt
+    if (!is.null(wgt)) {
+        wgt <- t(wgt) / saemodel$n
+        colnames(wgt) <- c("fixeff", "residual var", "area raneff var")
+        rownames(wgt) <- "sum(wgt)/n"
+        cat("---\nDegree of downweighting/winsorization:\n\n")
+        print.default(format(t(wgt), digits = digits), print.gap = 2,
+            quote = FALSE)
+    }
+    invisible(tTable)
 }
 # S3 coef method to extract the coefficients
 coef.fitsaemodel <- function(object, type = "both", ...)
 {
     model <- attr(object, "saemodel")
-    theta <- object$theta
-    beta <- object$beta
-    # FIXME: extract raneff and fixeff globaly; then, return the ones that
-    # are required
-    if (type == "both") {
-        raneff <- t(as.matrix(object$theta))
-        colnames(raneff) <- c("ResidualVar", "AreaVar")
-        rownames(raneff) <- "raneff"
-        fixeff <- t(as.matrix(object$beta))
-        colnames(fixeff) <- colnames(model$X)
-        rownames(fixeff) <- "fixeff"
-        res <- list(fixeff = fixeff, raneff = raneff)
-        print(fixeff)
-        cat("\n")
-        print(raneff)
-    }
-    if (type == "raneff") {
-        res <- t(as.matrix(object$theta))
-        colnames(res) <- c("ResidualVar", "AreaVar")
-        rownames(res) <- "raneff"
-        print(res)
-    }
-    if (type == "fixeff") {
-        res <- t(as.matrix(object$beta))
-        colnames(res) <- colnames(model$X)
-        rownames(res) <- "fixeff"
-        print(res)
-    }
-    invisible(res)
+    raneff <- t(as.matrix(object$theta))
+    colnames(raneff) <- c("ResidualVar", "AreaVar")
+    rownames(raneff) <- "raneff"
+
+    fixeff <- t(as.matrix(object$beta))
+    colnames(fixeff) <- colnames(model$X)
+    rownames(fixeff) <- "fixeff"
+
+    type <- match.arg(type, c("both", "raneff", "fixeff"))
+    if (type == "both")
+        type <- c("fixeff", "raneff")
+
+    res <- NULL
+    if ("fixeff" %in% type)
+        res$fixeff <- fixeff
+    if ("raneff" %in% type)
+        res$raneff <- raneff
+    res
 }
