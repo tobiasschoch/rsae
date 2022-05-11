@@ -2,10 +2,13 @@ makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
     areaID = NULL, ve = 1, ve.contam = 41, ve.epsilon = 0, vu = 1,
     vu.contam = 41, vu.epsilon = 0)
 {
+    stopifnot(is.numeric(beta), n > 0, g > 0, is.numeric(seed), is.numeric(ve),
+        is.numeric(ve.contam), is.numeric(ve.epsilon), is.numeric(vu),
+        is.numeric(vu.contam), is.numeric(vu.epsilon))
     # prepare the area-size-specific issues
     if (is.null(areaID)) {
-        N <- n*g
-        areaID <- rep(1:g, each=n)
+        N <- n * g
+        areaID <- rep(1:g, each = n)
         n <- rep(n, g)
     } else {
         n <- as.vector(table(areaID))
@@ -16,24 +19,22 @@ makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
     #number of regressonrs, excl. intercept
     p <- length(beta)
     if (is.null(intercept)) {
-        x <- matrix(NA, N, p)
-        beta.names <- paste(rep("x", p), 1:p, sep = "")
+        x <- matrix(NA_real_, N, p)
+        beta.names <- paste0(rep("x", p), 1:p)
         hasintercept <- 0
-        for (i in 1:p) {
+        for (i in 1:p)
             x[, i] <- rnorm(N)
-        }
     } else {
         beta <- c(intercept, beta)
-        beta.names <- c("(Intercept)", paste(rep("x", p), 1:p, sep = ""))
-        x <- matrix(NA, N, p+1)
+        beta.names <- c("(Intercept)", paste0(rep("x", p), 1:p))
+        x <- matrix(NA_real_, N, p + 1)
         x[, 1] <- rep(1, N)
         hasintercept <- 1
-        for (i in 2:(p+1)){
+        for (i in 2:(p + 1))
             x[, i] <- rnorm(N)
-        }
     }
     # get the final p
-    p <- dim(x)[2]
+    p <- NCOL(x)
     # give the columns of x names
     colnames(x) <- beta.names
     # generate y
@@ -44,8 +45,7 @@ makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
     else {
         # contaminated observations
         outliers <- sample(1:N, floor(ve.epsilon * N))
-        y[outliers] <- y[outliers] + rnorm(length(outliers), 0,
-            sqrt(ve.contam))
+        y[outliers] <- y[outliers] + rnorm(length(outliers), 0, sqrt(ve.contam))
         # un-contaminated observations
         non.outliers <- setdiff(1:N, outliers)
         y[non.outliers] <- y[non.outliers] + rnorm(length(non.outliers), 0,
@@ -59,9 +59,9 @@ makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
         u <- u + rep(raneff, length(u))
     }
     outlyingAreas <- sample(1:g, floor(g * vu.epsilon))
-    if (length(outlyingAreas) == 0)
+    if (length(outlyingAreas) == 0) {
         r <- lapply(y.list, addraneff, s=sqrt(vu))
-    else {
+    } else {
         non.outlyingAreas <- setdiff(1:g, outlyingAreas)
         r <- as.list(1:g)
         r[outlyingAreas] <- lapply(y.list[outlyingAreas], addraneff,
@@ -74,8 +74,8 @@ makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
     # prepare return value
     res <- list(y = y, X = x, areaID = areaID, nsize = n, g = g, p = p, n = N,
         intercept = hasintercept)
-    attr(res, "areaNames") <- paste(rep("A", g), 1:g, sep = "")
-    attr(res, "areadef") <- paste("area-specific ranef")
+    attr(res, "areaNames") <- paste0(rep("A", g), 1:g)
+    attr(res, "areadef") <- "area-specific ranef"
     attr(res, "yname") <- "y"
     attr(res, "xnames")<- beta.names
     attr(res, "call") <- match.call()
@@ -86,5 +86,5 @@ makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
         vu.contam = vu.contam, vu.epsilon = vu.epsilon)
     attr(res, "contam") <- list(skeleton = skeleton,
         outlyingAreas = outlyingAreas)
-    return(res)
+    res
 }
