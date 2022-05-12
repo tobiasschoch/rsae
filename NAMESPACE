@@ -18,6 +18,9 @@ S3method(print, fitsaemodel)
 S3method(summary, fitsaemodel)
 S3method(coef, fitsaemodel)
 
+S3method(summary, fitsaemodel)
+S3method(print, summary.fitsaemodel)
+
 # robpredict
 export(robpredict)
 S3method(print, meanssaemodel)

@@ -407,15 +407,15 @@ qqline(res)
 
 ## References {#biblio}
 
-COPT, S. AND M.-P. VICTORIA-FESER (2009). *Robust prediction in mixed linear models*, Tech. rep., University of Geneva.
+COPT, S. <span style="font-variant:small-caps;">and</span> M.-P. VICTORIA-FESER (2009). *Robust prediction in mixed linear models*, Tech. rep., University of Geneva.
 
-BATTESE, G. E., R. M. HARTER, AND W. A. FULLER (1988). An error component model for prediction of county crop areas using, *Journal of the American Statistical Association* **83**, 28--36.
+BATTESE, G. E., R. M. HARTER <span style="font-variant:small-caps;">and</span> W. A. FULLER (1988). An error component model for prediction of county crop areas using, *Journal of the American Statistical Association* **83**, 28--36.
 
 FELLNER, W. H. (1986). Robust estimation of variance components, *Technometrics* **28**, 51--60.
 
-HERITIER, S., E. CANTONI, S. COPT, AND M.-P. VICTORIA-FESER (2009). *Robust Methods in Biostatistics*, New York: John Wiley & Sons.
+HERITIER, S., E. CANTONI, S. COPT, <span style="font-variant:small-caps;">and</span> M.-P. VICTORIA-FESER (2009). *Robust Methods in Biostatistics*, New York: John Wiley & Sons.
 
-MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO AND M. A. DI PALMA (2021). *robustbase: Basic Robust Statistics*. R package version 0.93-9. URL http://CRAN.R-project.org/package=robustbase.
+MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO <span style="font-variant:small-caps;">and</span> M. A. DI PALMA (2021). *robustbase: Basic Robust Statistics*. R package version 0.93-9. URL http://CRAN.R-project.org/package=robustbase.
 
 RAO, J.N.K. (2003). *Small Area Estimation*, New York: John Wiley and Sons.
 
@@ -423,16 +423,16 @@ RICHARDSON, A. M. (1995). *Some problems in estimation in mixed linear models*, 
 
 RICHARDSON, A. M. (1997). Bounded Influence Estimation in the Mixed Linear Model, *Journal of the American Statistical Association* **92**, 151--161.
 
-RICHARDSON, A. M. AND A. H. WELSH (1995). Robust Restricted Maximum Likelihood in Mixed Linear Models, *Biometrics* **51**, 1429--1439.
+RICHARDSON, A. M. <span style="font-variant:small-caps;">and</span> A. H. WELSH (1995). Robust Restricted Maximum Likelihood in Mixed Linear Models, *Biometrics* **51**, 1429--1439.
 
 ROUSSEEUW, P. J. (1984). Least Median of Squares Regression, *Journal of the American Statistical Association* **79**, 871--880.
 
-ROUSSEEUW, P. J. AND K. VAN DRIESSEN (2006). Computing LTS Regression for Large Data Sets, *Data Mining and Knowledge Discovery* **12**, 29--45.
+ROUSSEEUW, P. J. <span style="font-variant:small-caps;">and</span> K. VAN DRIESSEN (2006). Computing LTS Regression for Large Data Sets, *Data Mining and Knowledge Discovery* **12**, 29--45.
 
-ROUSSEEUW, P. J. AND V. YOHAI (1984). Robust Regression by Means of S Estimators, in *Robust and Nonlinear Time Series Analysis*, ed. by FRANKE, J., W. HÄRDLE AND R. D. MARTIN, New York: Springer, 256--274.
+ROUSSEEUW, P. J. <span style="font-variant:small-caps;">and</span> V. YOHAI (1984). Robust Regression by Means of S Estimators, in *Robust and Nonlinear Time Series Analysis*, ed. by FRANKE, J., W. HÄRDLE AND R. D. MARTIN, New York: Springer, 256--274.
 
-SALIBIAN-BARRERA, M. AND V. J. YOHAI (2006). A Fast Algorithm for S-Regression Estimates, *Journal of Computational and Graphical Statistics* **15**, 414--427.
+SALIBIAN-BARRERA, M. <span style="font-variant:small-caps;">and</span> V. J. YOHAI (2006). A Fast Algorithm for S-Regression Estimates, *Journal of Computational and Graphical Statistics* **15**, 414--427.
 
 SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* **41**, 243--265.
 
-SINHA, S.K. AND J.N.K. RAO (2009). Robust small area estimation. *Canadian Journal of Statistics* **37**, 381--399.
+SINHA, S.K. <span style="font-variant:small-caps;">and</span> J.N.K. RAO (2009). Robust small area estimation. *Canadian Journal of Statistics* **37**, 381--399.

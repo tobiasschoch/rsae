@@ -2,15 +2,21 @@
 
 ## BUG FIXES
 
-* fixed namespace issues
+* fixed name space issues
 * fixed DESCRIPTION file
 * replaced `require()` in function `.initmethod()` with
-    `requireNamespace()`
+    `requireNamespace()` in order to load functions from the `robustbase` package.
 
 ## CHANGES
 
-* `coef()` method for objects of class `fitsaemodel` only returns the coefficients but does print to the console anymore 
-* `fitsaemodel.control()` gained the additional argument `k_Inf` to specify the robustness tuning constant k that represents infinity (used to define the maximum likelihood estimator)
+* `fitsaemodel()`
+  * If the algorithm does not converge, `fitsaemodel()` returns an object of class `fitsaemodel` with the slots `beta` (estimated fixed-effects coefficients) and `theta` (variance components) equal to `NA`.
+  * The covariance matrix of the fixed effects (`vcovbeta`) is now computed in function `summary()` and not `fitsaemodel()`. This goes unnoticed by the user. 
+
+* The  function `coef.fitsaemodel()` only returns the coefficients but does print to the console anymore. 
+* Function `fitsaemodel.control()` gained the additional argument `k_Inf` to specify the robustness tuning constant k that represents infinity (used to define the maximum likelihood estimator)
+* Argument `digit` of the functions `print.fitsaemodel()` depends now on `getOption("digits")`.
+* Function `summary.fitsaemodel()` returns now the model summary. 
 
 ## MISC
 

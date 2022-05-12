@@ -1,6 +1,7 @@
 \name{fitsaemodel}
 \alias{fitsaemodel}
 \alias{print.fitsaemodel}
+\alias{print.summary.fitsaemodel}
 \alias{summary.fitsaemodel}
 \alias{coef.fitsaemodel}
 \alias{convergence}
@@ -15,9 +16,12 @@
 fitsaemodel(method, model, ...)
 convergence(object)
 
-\method{print}{fitsaemodel}(x, digits=6, ...)
-\method{summary}{fitsaemodel}(object, digits=6, ...)
-\method{coef}{fitsaemodel}(object, type="both", ...)
+\method{print}{fitsaemodel}(x, digits = max(3L, getOption("digits") - 3L),
+    ...)
+\method{print}{summary.fitsaemodel}(x, digits = max(3L, getOption("digits")
+    - 3L), ...)
+\method{summary}{fitsaemodel}(object, ...)
+\method{coef}{fitsaemodel}(object, type = "both", ...)
 }
 \arguments{
     \item{method}{character string defining the method to be used; currently,

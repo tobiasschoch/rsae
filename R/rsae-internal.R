@@ -1,100 +1,62 @@
+# consistency correction term
 .computekappa <- function(k)
 {
     2 * (k^2 * (1 - pnorm(k)) + pnorm(k) - 0.5  - k * dnorm(k))
 }
-
-.fitsaemodel.huberm <- function(method, model, k,
+# workhorse function
+.fitsaemodel_huberm <- function(method, model, k,
     control = fitsaemodel.control(...), ...)
 {
-    eps <- .Machine$double.eps
-    # switch method
+    # methods: 'ml' vs. 'huberm'
     if (method == "ml") {
         k <- rep(control$k_Inf, 3)
-        k.report <- k[1]
-        kappa <- rep(1.0, 2)
+        kappa <- rep(1, 2)
         methodName <- list(type = "Maximum likelihood estimation")
     } else {
         if (missing(k))
-            stop("Robustness tuning constant is missing! \n")
-        if (is.list(k)){
-            if( any(is.na(match(names(k), c("beta", "v", "d")))) )
-                stop("List of robustness tuning constants 'k' must consist\nof the elements 'beta', 'v', and 'd'!\n")
+            stop("Robustness tuning constant is missing! \n", call. = FALSE)
+        if (is.list(k)) {
+            if (any(is.na(match(names(k), c("beta", "v", "d")))))
+                stop("k can be list with named entries 'beta', 'v', and 'd'\n",
+                    call. = FALSE)
             k <- c(k$beta, k$v, k$d)
-            if ( any(k <= 0) )
-                stop("Robustness tuning constants must be larger than zero!\n")
+            stopifnot(all(is.numeric(k)), all(k) > 0)
             kappa <- c(.computekappa(k[2]), .computekappa(k[3]))
             k.report <- k
         } else {
-            if ( length(k) != 1 )
-                stop("Robustness tuning constant 'k' must be either\na scalar or a list!\n")
-            if (k < 0)
-                stop("Robustness tuning constant k must be > 0!\n")
-            kmin <- eps^(1 / 4)
-            if (k < kmin)
-                stop(paste("Robustness tuning constant k is too small (note kmin = ",
-                    kmin, ").\n"))
-            # consistency correction term for Huber-Proposal-2 scale estimate
+            stopifnot(length(k) == 1, is.numeric(k), k > 0)
+            kappa <- rep(.computekappa(k), 2)
             k <- rep(k, 3)
             k.report <- k[1]
-            kappa <- .computekappa(k)
-            kappa <- rep(kappa, 2)
         }
         methodName <- list(type = "Huber-type M-estimation", tuning =
             list(k = k.report))
     }
-    #FIXME: do we need all these definitions? x, y, nsize, ...?
-    # data preparation
-    x <- model$X
-    y <- model$y
-    # vector of area size
-    nsize <- model$nsize
-    # number of observations
-    n <- model$n
-    # number of areas
-    g <- model$g
-    # number of fixed effects
-    p <- model$p
-    # total number of overall iterations
-    niter <- control$niter
-    # vector of iterations delivered drsaebetaiter and drsaehubdest
-    iter <- control$iter
-    # matrix recording the number of iterations
-    iterrecord <- matrix(0, niter, 3)
-    # acc specification
-    allacc <- control$acc[1]
-    acc <- control$acc[2:4]
-    # type of decomposition for matrix square root
-    dec <- control$dec
-    # type of decorrelation
-    decorr <- control$decorr
-    # sum of Huber downweighting
-    sumwgt <- c(0, 0, 0)
     # initialize the full parameter vector
-    #FIXME: can we simplify the call of '.initmethod'? w.r.t. control$add?
     init <- if (length(control$add) == 0)
         .initmethod(model, control$init)
     else
         .initmethod(model, control$init, control$add)
-    tau <- init
-    # matrix recodring iteration-specific estimates
-    taurecord <- matrix(0, niter, (p + 2))
-    # define epsd (minimal d that is different from zero)
-    epsd <- eps^(1 / 4)
-    # call
-    tmp <- .Fortran("drsaehub", n = as.integer(n), p = as.integer(p),
-        g = as.integer(g), niter = as.integer(niter),
-        nsize = as.integer(nsize), iter = as.integer(iter),
-        iterrecord = as.matrix(iterrecord), allacc = as.double(allacc),
-        acc = as.matrix(acc), sumwgt = as.matrix(sumwgt), xmat = as.matrix(x),
-        yvec = as.matrix(y), k = as.matrix(k), kappa = as.matrix(kappa),
-        epsd = as.double(epsd), tau = as.matrix(tau),
+    # compute estimates
+    taurecord <- matrix(0, control$niter, (model$p + 2))
+    eps <- .Machine$double.eps
+    tmp <- .Fortran("drsaehub", n = as.integer(model$n),
+        p = as.integer(model$p), g = as.integer(model$g),
+        niter = as.integer(control$niter), nsize = as.integer(model$nsize),
+        iter = as.integer(control$iter), iterrecord = as.matrix(matrix(0,
+        control$niter, 3)), allacc = as.double(control$acc[1]),
+        acc = as.matrix(control$acc[2:4]), sumwgt = as.matrix(rep(0, 3)),
+        xmat = as.matrix(model$X), yvec = as.matrix(model$y),
+        k = as.matrix(k), kappa = as.matrix(kappa),
+        epsd = as.double(eps^(1 / 4)), tau = as.matrix(init),
         taurecord = as.matrix(taurecord), converged = as.integer(0),
-        dec = as.integer(dec), decorr = as.integer(decorr), PACKAGE = "rsae")
-    # return values
-    #HOTFIX!, check for cycling an choose the parameter-vector estimate whose
+        dec = as.integer(control$dec), decorr = as.integer(control$decorr),
+        PACKAGE = "rsae")
+    # check for cycling an choose the parameter-vector estimate whose
     # estimate of v is closer to the (robust) init (i.e., either the "lts" or
     # "s" estimate) value. This method is not supported for init=default or ml
     converged <- tmp$converged
+    p <- model$p
     if (control$init > 0 & converged == 0) {
         taurecord <- tmp$taurecord
         # take the second diff, take the mean over each parameter vector,
@@ -114,39 +76,24 @@
     } else {
         tau <- tmp$tau
     }
-    #FIXME: new function for covariance matrix, which is to be called by
-    #    summary() and vcov(); do other steps depend on the cov mat being
-    #    computed here?
-    # compute the covariance matrix of the fixed effects
-    if (converged == 1){
-        vcovbeta <- matrix(0, p, p)
-        v_est <- .Fortran("drsaehubvariance", n = as.integer(n),
-            p = as.integer(p), g = as.integer(g), nsize = as.integer(nsize),
-            kappa = as.double(kappa), v = as.double(tau[p + 1]),
-            d = as.double(tau[p + 2]), xmat = as.matrix(x),
-            vcovbeta = as.matrix(vcovbeta), dec = as.integer(dec),
-            PACKAGE = "rsae")
-        vcovbeta <- v_est$vcovbeta
-    } else {
-        vcovbeta <- NULL
-    }
+    if (converged != 1)
+        tau <- rep(NA_real_, p + 2)
+
     res <- list(beta = tau[1:p], theta = c(tau[p+1], tau[p + 1] * tau[p + 2]),
-        converged = converged, vcovbeta = vcovbeta)
+        converged = converged)
     # additional attributes
-    attr(res, "call") <- match.call()
-    attr(res, "optim") <- list(acc = c(allacc, acc), niter = c(niter, iter),
-        usediter = tmp$iterrecord, tau = tmp$taurecord)
+    attr(res, "optim") <- list(acc = control$acc, niter = c(control$niter,
+        control$iter), usediter = tmp$iterrecord, tau = tmp$taurecord,
+        kappa = kappa)
     if (method == "huberm")
         attr(res, "robustness") <- list(wgt = tmp$sumwgt)
-
     attr(res, "init") <- init
     attr(res, "method") <- methodName
     attr(res, "saemodel") <- model
-    attr(res, "dec") <- dec
-    class(res) <- "fitsaemodel"
-    return(res)
+    attr(res, "dec") <- control$dec
+    res
 }
-
+# initialization
 .initmethod <- function(model, init, ...)
 {
     n <- model$n
