@@ -97,45 +97,36 @@
 # initialization
 .initmethod <- function(model, init, ...)
 {
-    n <- model$n
-    p <- model$p
-    intercept <- model$intercept
-    #FIXME: use a switch?
-    #-------------
     # default (i.e., robust fixed-effects estimator; see AJS2012)
     if (init == 0) {
-        # FIXME: make it an argument of .initmethod
-        k <- 1.345
-        # retrieve all the model characteristics
-        y <- model$y
-        X <- as.data.frame(model$X)
-        g <- model$g
         areaID <- model$areaID
         # center y by the area-specific median of y
-        y.list <- split(y, areaID)
+        y.list <- split(model$y, areaID)
         y.centered.list <- lapply(y.list, function(u) u - median(u))
         y.centered <- unsplit(y.centered.list, areaID)
         # center X by the area-specific mean of x
-        X.list <- split(X, areaID)
+        X.list <- split(model$X, areaID)
         X.centered.list <- lapply(X.list, function(u)
             as.data.frame(sweep(as.matrix(u), 2, colMeans(u))))
         X.centered <- unsplit(X.centered.list, areaID)
-        if (intercept == 1) {
+        p <- model$p
+        g <- model$g
+        if (model$intercept == 1) {
             X.centered <- X.centered[, -1]
             p <- p - 1
         }
         # prepare the model.frame
         mm <- model.matrix(~ -1 + as.factor(areaID))
-        x <- cbind(X.centered, mm)
+        # some magic numbers
+        k <- 1.345; acc <- 0.00001; niter <- 20
         # compute the robust fixed-effects estimator
-        initbeta <- rep(1, (p + g))
-        #FIXME: remove magic numbers niter = 20 and s = 1.2, acc = 0.000001
-        tmp <- .Fortran("drlm", n = as.integer(n), p = as.integer(p + g),
-            xmat = as.matrix(x), yvec = as.matrix(y.centered),
-            k = as.double(k), beta = as.matrix(initbeta), s = as.double(1.2),
-            info = as.integer(1), niter = as.integer(20),
-            acc = as.double(0.00001), PACKAGE = "rsae")
-        result <- c(0, tmp$beta[1:p], tmp$s^2, 100)
+        tmp <- .Fortran("drlm", n = as.integer(model$n),
+            p = as.integer(p + g), xmat = as.matrix(cbind(X.centered, mm)),
+            yvec = as.matrix(y.centered), k = as.double(k),
+            beta = as.matrix(rep(1, (p + g))), s = as.double(1.2),
+            info = as.integer(1), niter = as.integer(niter),
+            acc = as.double(acc), PACKAGE = "rsae")
+        res <- c(0, tmp$beta[1:p], tmp$s^2, 100)
     }
     #-------------
     # check whether robustbase must be loaded
@@ -145,35 +136,28 @@
             stop("You cannot use 'lts' or 's', because the \n
                 'robustbase' package is not installed! \n", call. = FALSE)
     }
-    #FIXME: use a switch?
     #-------------
     # lts
     if (init == 1) {
         x <- as.matrix(model$X)
-        # check if it has an intercept
-        if (intercept == 1) {
-            x <- as.matrix(x[, (2:p)])
+        if (model$intercept == 1) {
+            x <- as.matrix(x[, (2:model$p)])
             intercept <- TRUE
         } else {
-            cat
             intercept <- FALSE
         }
-        y <- model$y
-        tmp <- robustbase::ltsReg(x = x, y = y, intercept=intercept, ...)
-        # compute (robust) variance bound of d
-        # repare return value (beta, v, d)
-        result <- as.numeric(c(tmp$coefficients, tmp$raw.scale^2, 1))
+        tmp <- robustbase::ltsReg(x = x, y = model$y, intercept=intercept, ...)
+        res <- as.numeric(c(tmp$coefficients, tmp$raw.scale^2, 1))
     }
     #-------------
     # lmrob.S
     if (init == 2) {
-        x <- as.matrix(model$X)
-        y <- model$y
         control <- robustbase::lmrob.control(...)
-        tmp <- robustbase::lmrob.S(x = x, y = y, control=control)
-        result <- as.numeric(c(tmp$coefficients, tmp$scale^2, 1))
+        tmp <- robustbase::lmrob.S(x = as.matrix(model$X), y = model$y,
+            control = control)
+        res <- as.numeric(c(tmp$coefficients, tmp$scale^2, 1))
     }
-    return(result)
+    res
 }
 # S3 print method
 print.fit_model_b <- function (x, digits = max(3L, getOption("digits") - 3L),
