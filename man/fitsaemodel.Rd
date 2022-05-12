@@ -1,9 +1,9 @@
 \name{fitsaemodel}
 \alias{fitsaemodel}
-\alias{print.fitsaemodel}
-\alias{print.summary.fitsaemodel}
-\alias{summary.fitsaemodel}
-\alias{coef.fitsaemodel}
+\alias{print.fit_model_b}
+\alias{print.summary_fit_model_b}
+\alias{summary.fit_model_b}
+\alias{coef.fit_model_b}
 \alias{convergence}
 \title{Fitting SAE Models}
 \description{
@@ -16,12 +16,12 @@
 fitsaemodel(method, model, ...)
 convergence(object)
 
-\method{print}{fitsaemodel}(x, digits = max(3L, getOption("digits") - 3L),
+\method{print}{fit_model_b}(x, digits = max(3L, getOption("digits") - 3L),
     ...)
-\method{print}{summary.fitsaemodel}(x, digits = max(3L, getOption("digits")
+\method{print}{summary_fit_model_b}(x, digits = max(3L, getOption("digits")
     - 3L), ...)
-\method{summary}{fitsaemodel}(object, ...)
-\method{coef}{fitsaemodel}(object, type = "both", ...)
+\method{summary}{fit_model_b}(object, ...)
+\method{coef}{fit_model_b}(object, type = "both", ...)
 }
 \arguments{
     \item{method}{character string defining the method to be used; currently,
@@ -32,8 +32,7 @@ convergence(object)
     \item{x}{used by the \code{print} method.}
     \item{digits}{used by the \code{print} and \code{summary} methods; number
         of decimal places to be shown.}
-    \item{object}{an object of the class \code{"\link{fitsaemodel}"}; i.e., a
-        fitted model.}
+    \item{object}{an object obtained by \code{"\link{fitsaemodel}"}.}
     \item{type}{character string use in the \code{coef} method; it can take
         one of the following possibilities: \code{"both"}, \code{"ranef"}, or
         \code{"fixef"}. The first reports both, random and fixed effects

@@ -1,4 +1,3 @@
-%FIXME:
 \name{robpredict}
 \alias{robpredict}
 \alias{print.meanssaemodel}
@@ -22,7 +21,7 @@ robpredict(fit, areameans = NULL, k = NULL, reps = NULL)
 \method{residuals}{meanssaemodel}(object, ...)
 }
 \arguments{
-    \item{fit}{a fitted SAE model; object of class \code{fitsaemodel}.}
+    \item{fit}{a fitted SAE model; object of class \code{fit_model_b}.}
     \item{areameans}{numeric matrix (typically, with area-level means);
         the no. of rows must be equal to the no. of areas; the no. of
         columns must be equal to the no. of fixed-effects coefficients
@@ -50,13 +49,12 @@ robpredict(fit, areameans = NULL, k = NULL, reps = NULL)
         \code{sort = NULL}); similarly, with \code{sort = "fixef"} and
         \code{sort = "ranef"} the predicted means are sorted along the
         fixed effects or the random effects, respectively.}
-    \item{object}{object of the class \code{fitsaemodel}; a fitted model
+    \item{object}{object of the class \code{fit_model_b}; a fitted model
         used in the \code{residuals} method.}
     \item{\dots}{not used.}
 }
 \details{
     The \code{robpredict} function enables the following modes of prediction:
-
     \itemize{
         \item if \code{areameans = NULL}, then the predictions are exclusively
             based on the sample values,
@@ -73,7 +71,6 @@ robpredict(fit, areameans = NULL, k = NULL, reps = NULL)
             (robust) parametric bootstrap; see Lahiri (2003) and Hall and
             Maiti (2006) for more details.
         }
-
     The tuning constant \code{k} regulates the degree of robustness
     (i.e., degree of winsorization of the Huber psi-function) when predicting
     the random effects. If \code{k} is sufficiently large (ideally, if

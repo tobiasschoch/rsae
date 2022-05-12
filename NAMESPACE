@@ -14,12 +14,11 @@ S3method(as.matrix, saemodel)
 # fitsaemodel
 export(fitsaemodel)
 export(fitsaemodel.control)
-S3method(print, fitsaemodel)
-S3method(summary, fitsaemodel)
-S3method(coef, fitsaemodel)
-
-S3method(summary, fitsaemodel)
-S3method(print, summary.fitsaemodel)
+S3method(print, fit_model_b)
+S3method(summary, fit_model_b)
+S3method(coef, fit_model_b)
+S3method(summary, fit_model_b)
+S3method(print, summary_fit_model_b)
 
 # robpredict
 export(robpredict)

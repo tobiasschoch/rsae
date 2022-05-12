@@ -9,14 +9,15 @@
 
 ## CHANGES
 
-* `fitsaemodel()`
-  * If the algorithm does not converge, `fitsaemodel()` returns an object of class `fitsaemodel` with the slots `beta` (estimated fixed-effects coefficients) and `theta` (variance components) equal to `NA`.
+* Function `fitsaemodel()`
+  * returns now an object of class`fit_model_b` (in earlier versions, the class was called `fitsaemodel`)
+  * If the algorithm does not converge, `fitsaemodel()` returns an object with the slots `beta` (estimated fixed-effects coefficients) and `theta` (variance components) equal to a vector of `NA`'s.
   * The covariance matrix of the fixed effects (`vcovbeta`) is now computed in function `summary()` and not `fitsaemodel()`. This goes unnoticed by the user. 
-
-* The  function `coef.fitsaemodel()` only returns the coefficients but does print to the console anymore. 
+  
+* The  function `coef.fit_model_b()` only returns the coefficients but does print to the console anymore. 
 * Function `fitsaemodel.control()` gained the additional argument `k_Inf` to specify the robustness tuning constant k that represents infinity (used to define the maximum likelihood estimator)
-* Argument `digit` of the functions `print.fitsaemodel()` depends now on `getOption("digits")`.
-* Function `summary.fitsaemodel()` returns now the model summary. 
+* Argument `digit` of the functions `print.fit_model_b()` depends now on `getOption("digits")`.
+* Function `summary.fit_model_b()` returns now the model summary. 
 
 ## MISC
 

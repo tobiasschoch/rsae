@@ -1,7 +1,10 @@
 robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL)
 {
-    if (!inherits(fit, "fitsaemodel"))
-        stop("fit must be of class 'fitsaemodel'", call. = FALSE)
+    if (!inherits(fit, "fit_model_b"))
+        stop("fit must be of class 'fit_model_b'", call. = FALSE)
+    if (fit$converged == 0)
+        stop("Prediction is not possible because algorithm\nof fitted model did not converge\n\n",
+             call. = FALSE)
 
     model <- attr(fit, "saemodel")          # sae model
     dec <- attr(fit, "dec")                 # type of decomposition
