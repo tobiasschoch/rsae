@@ -101,18 +101,16 @@
     if (init == 0) {
         areaID <- model$areaID
         # center y by the area-specific median of y
-        y.list <- split(model$y, areaID)
-        y.centered.list <- lapply(y.list, function(u) u - median(u))
-        y.centered <- unsplit(y.centered.list, areaID)
+        y_list <- split(model$y, areaID)
+        y_centered <- unsplit(lapply(y_list, function(u) u - median(u)), areaID)
         # center X by the area-specific mean of x
-        X.list <- split(model$X, areaID)
-        X.centered.list <- lapply(X.list, function(u)
-            as.data.frame(sweep(as.matrix(u), 2, colMeans(u))))
-        X.centered <- unsplit(X.centered.list, areaID)
+        X_list <- split(as.data.frame(model$X), areaID)
+        X_centered <- unsplit(lapply(X_list, function(u)
+            as.data.frame(sweep(as.matrix(u), 2, colMeans(u)))), areaID)
         p <- model$p
         g <- model$g
         if (model$intercept == 1) {
-            X.centered <- X.centered[, -1]
+            X_centered <- X_centered[, -1]
             p <- p - 1
         }
         # prepare the model.frame
@@ -121,8 +119,8 @@
         k <- 1.345; acc <- 0.00001; niter <- 20
         # compute the robust fixed-effects estimator
         tmp <- .Fortran("drlm", n = as.integer(model$n),
-            p = as.integer(p + g), xmat = as.matrix(cbind(X.centered, mm)),
-            yvec = as.matrix(y.centered), k = as.double(k),
+            p = as.integer(p + g), xmat = as.matrix(cbind(X_centered, mm)),
+            yvec = as.matrix(y_centered), k = as.double(k),
             beta = as.matrix(rep(1, (p + g))), s = as.double(1.2),
             info = as.integer(1), niter = as.integer(niter),
             acc = as.double(acc), PACKAGE = "rsae")
