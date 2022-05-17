@@ -1,5 +1,5 @@
 robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
-        progress_bar = TRUE)
+        seed = 1024, progress_bar = TRUE)
 {
     if (!inherits(fit, "fit_model_b"))
         stop("fit must be of class 'fit_model_b'", call. = FALSE)
@@ -48,7 +48,8 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
         fixeff <- areameans %*% fit$beta
         # compute mean square prediction error (bootstrap)
         if (!is.null(reps)) {
-            stopifnot(is.numeric(reps), reps > 0)
+            stopifnot(is.numeric(reps), reps > 0, is.numeric(seed))
+            set.seed(seed)
             mspe <- .mspe(fit, as.integer(reps), areameans, fixeff,
                 progress_bar)
         }
@@ -86,7 +87,7 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     model <- attr(fit, "saemodel")
     Xbeta <- as.matrix(model$X) %*% fit$beta
     predicts <- matrix(NA_real_, reps, model$g)
-    for (j in 1:reps) {
+    for (i in 1:reps) {
         # draw model error, e
         e <- rnorm(model$n, 0, theta[1])
         # draw raneff, v
@@ -99,11 +100,13 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
         # compute the model parameters using ml
         tmp <- fitsaemodel("ml", model)
         # predict
-        predicts[j, ] <- t(robpredict(tmp, areameans, k = 20000,
-            reps = NULL)$means) - t(predrf)
+        tmp <- robpredict(tmp, areameans, k = 20000, reps = NULL,
+            progress_bar = FALSE)
+        predicts[i, ] <- t(tmp$means - predrf)
+
         # update progress bar
         if (progress_bar)
-            setTxtProgressBar(p_bar, j)
+            setTxtProgressBar(p_bar, i)
     }
     if (progress_bar)
         close(p_bar)
@@ -111,10 +114,8 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     colMeans(predicts^2)
 }
 # S3 plot method
-#FIXME:
-plot.pred_model_b <- function(x, y = NULL, type = "e", sort = NULL, ...)
+plot.pred_model_b <- function(x, type = "e", sort = NULL, ...)
 {
-    # y is part of the generic (later, we will use y to allow plot comparison)
     fe <- x$fixeff
     re <- x$raneff
     means <- x$means
@@ -133,7 +134,6 @@ plot.pred_model_b <- function(x, y = NULL, type = "e", sort = NULL, ...)
     }
     # prepare the plot
     g <- length(re)
-    at <- 1:g
     # without mspe
     if (is.null(mspe)) {
         ra <- range(means)
@@ -145,10 +145,10 @@ plot.pred_model_b <- function(x, y = NULL, type = "e", sort = NULL, ...)
         means <- c(means, NA)
         areaNames <- c(areaNames, "")
         op <- par(mfcol = c(1, 1), mar = c(4, 8, 2, 4))
-        plot(means, at, type = "b", col = 2, lwd = 2, axes = FALSE,
+        plot(means, 1:g, type = "b", col = 2, lwd = 2, axes = FALSE,
             xlab = "predicted mean", ylab = "", xlim = ra,
             main = "Predicted means")
-        lines(fe, at, type = "b", col = 1, lwd = 2, xlim = ra)
+        lines(fe, 1:g, type = "b", col = 1, lwd = 2, xlim = ra)
         axis(2, seq(1, g), labels = areaNames, las = 1)
         axis(1)
         grid(col = "gray65", lty = 2, lwd = 1)
@@ -163,18 +163,18 @@ plot.pred_model_b <- function(x, y = NULL, type = "e", sort = NULL, ...)
         # compute plotting range
         ra <- range(means + sqrt(mspe), means - sqrt(mspe))
         op <- par(mfcol =c (1, 1), mar = c(8, 4, 2, 4))
-        plot(at, means, type = "b", col = 2, lwd = 2, axes = FALSE,
+        plot(1:g, means, type = "b", col = 2, lwd = 2, axes = FALSE,
                 xlab = "", ylab = "predicted area mean", ylim = ra,
                 main = "Predicted means (+/- SQRT[MSPE])")
         if (type == "l") {
-            lines(at, means + sqrt(mspe), type = "b", col = 1, lwd = 2,
+            lines(1:g, means + sqrt(mspe), type = "b", col = 1, lwd = 2,
                 lty = 2, xlim = ra)
-            lines(at, means - sqrt(mspe), type = "b", col = 1, lwd = 2,
+            lines(1:g, means - sqrt(mspe), type = "b", col = 1, lwd = 2,
                 lty = 2, xlim = ra)
         }
         if (type == "e") {
-            arrows(at, means - sqrt(mspe), at, means + sqrt(mspe), angle = 90,
-                code = 3, ...)
+            arrows(1:g, means - sqrt(mspe), 1:g, means + sqrt(mspe),
+                angle = 90, code = 3, ...)
         }
         axis(1, seq(1, g), labels = abbreviate(areaNames, minlength = 12),
             las = 2)

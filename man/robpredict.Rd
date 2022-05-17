@@ -14,11 +14,12 @@
     bootstrap method.
 }
 \usage{
-robpredict(fit, areameans = NULL, k = NULL, reps = NULL, progress_bar = TRUE)
+robpredict(fit, areameans = NULL, k = NULL, reps = NULL, seed = 1024,
+    progress_bar = TRUE)
 
 \method{print}{pred_model_b}(x, digits = max(3L, getOption("digits") - 3L),
     ...)
-\method{plot}{pred_model_b}(x, y = NULL, type = "e", sort = NULL, ...)
+\method{plot}{pred_model_b}(x, type = "e", sort = NULL, ...)
 \method{residuals}{pred_model_b}(object, ...)
 }
 \arguments{
@@ -38,11 +39,13 @@ robpredict(fit, areameans = NULL, k = NULL, reps = NULL, progress_bar = TRUE)
     \item{reps}{\code{[integer}] or \code{[NULL]} number of bootstrap
         replicates for the computation of the mean squared prediction
         error (MSPE).  If \code{reps = NULL} the MSPE is not computed.}
+    \item{seed}{\code{[integer]} a positive integer used as argument
+        \code{seed} in \code{\link[=set.seed]{set.seed()}} to specify
+        the random seed.}
     \item{progress_bar}{\code{[logical]} whether a progress bar is displayed
         for the parametric bootstrap; default: \code{TRUE}.}
     \item{x}{an object of class \code{"pred_model_b"}.}
     \item{digits}{\code{[integer]} number of digits to be printed by.}
-    \item{y}{\code{NULL}.}
     \item{type}{\code{[character]} type of \code{plot} method: \code{"e"}
         (error bars; default) or \code{"l"} (lines).}
     \item{sort}{\code{[character]} or \code{[NULL]} if \code{sort = "means"},

@@ -13,12 +13,14 @@
   * returns now an object of class`fit_model_b` (in earlier versions, the class was called `fitsaemodel`)
   * If the algorithm does not converge, `fitsaemodel()` returns an object with the slots `beta` (estimated fixed-effects coefficients) and `theta` (variance components) equal to a vector of `NA`'s.
   * The covariance matrix of the fixed effects (`vcovbeta`) is now computed in function `summary()` and not `fitsaemodel()`. This goes unnoticed by the user. 
-  
 * The  function `coef.fit_model_b()` only returns the coefficients but does print to the console anymore. 
 * Function `fitsaemodel.control()` gained the additional argument `k_Inf` to specify the robustness tuning constant k that represents infinity (used to define the maximum likelihood estimator)
 * Argument `digit` of the function `print.fit_model_b()` depends now on `getOption("digits")`.
 * Function `summary.fit_model_b()` returns now the model summary (in addition to printing to the console).
-* The progress bar in function `robpredict()` is now implemented with `utils:txtProgressBar()` and can be switched off using argument `progress_bar`.
+* Function `robpredict()` 
+  * The function gained the additional argument `seed`  to specify the random seed in the parametric bootstrap.
+  * The progress bar in function `robpredict()` is now implemented with `utils:txtProgressBar()` and can be switched off using argument `progress_bar`.
+
 
 ## MISC
 
