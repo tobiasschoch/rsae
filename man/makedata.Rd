@@ -11,38 +11,40 @@ makedata(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20, areaID = NULL,
          vu.epsilon = 0)
 }
 \arguments{
-    \item{seed}{an integer, defining the \code{set.seed} (default
+    \item{seed}{\code{[integer]} seed value used in \code{set.seed} (default
         \code{seed = 1024}).}
-    \item{intercept}{either a scalar as intercept of the fixed-effects
-        model or \code{NULL} (default: \code{intercept = 1}).}
-    \item{beta}{scalar or vector defining the fixed-effect coefficients
-        (default: \code{beta = 1}). For each given coefficient, a vector of
-        realizations is drawn from the standard normal distribution.}
-    \item{n}{integer, defining the number of units per area in balanced-data
+    \item{intercept}{\code{[numeric]} or \code{[NULL]} value of the intercept
+        of the fixed-effects model or \code{NULL} for a model without
+        intercept (default: \code{intercept = 1}).}
+    \item{beta}{\code{[numeric vector]} value of the fixed-effect coefficients
+        (without intercept; default: \code{beta = 1}). For each given
+        coefficient, a vector of realizations is drawn from the standard
+        normal distribution.}
+    \item{n}{\code{[integer]} number of units per area in balanced-data
         setups (default: \code{n = 4}).}
-    \item{g}{integer, defining the number of areas (default: \code{g = 20}).}
-    \item{areaID}{by default \code{areaID = NULL}. If one attempts to generate
-        synthetic unbalanced data, one may call \code{makedata} with
+    \item{g}{\code{[integer]} number of areas (default: \code{g = 20}).}
+    \item{areaID}{\code{[integer vector]} or \code{[NULL]}. If one attempts
+        to generate synthetic unbalanced data, one calls \code{makedata} with
         a vector, the elements of which area identifiers. This vector
         should contain a series of (integer valued) area IDs. The number
-        of areas is set equal to the number unique IDs; see the \code{rsae}
-        Vignette for more details.}
-    \item{ve}{scalar, defining the model/ residual variance.}
-    \item{ve.contam}{scalar, defining the model variance of the outlier
-        part in a mixture distribution (Tukey-Huber-type contamination
-        model) \eqn{e = (1-h)N(0, ve) + hN(0, ve.contam)}{e = (1-h)*N(0, ve)
-        + h*N(0, ve.contam)}.}
-    \item{ve.epsilon}{scalar, defining the relative number of outliers
-        (i.e., epsilon or h in the contamination mixture distribution).
-        Typically, it takes values between 0 and 0.5 (but it is not
-        restricted to this interval).}
-    \item{vu}{scalar, defining the (area-level) random-effect variance.}
-    \item{vu.contam}{scalar, defining the (area-level) random-effect
-        variance of the outlier part in the contamination mixture
-        distribution (cf., \code{ve.contam}).}
-    \item{vu.epsilon}{scalar, defining the relative number of outliers
-        in the contamination mixture distribution of the (area-level)
-        random effects (cf., \code{ve.epsilon}).}
+        of areas is set equal to the number unique IDs.}
+    \item{ve}{\code{[numeric]} nonnegative value of model/ residual variance.}
+    \item{ve.contam}{\code{[numeric]} nonnegative value of model variance of
+        the outlier part in a mixture distribution (Tukey-Huber-type
+        contamination model) \eqn{e = (1-h)N(0, ve) + hN(0, ve.contam)}
+        {e = (1-h)*N(0, ve) + h*N(0, ve.contam)}.}
+    \item{ve.epsilon}{\code{[numeric]} value in \eqn{[0,1]}{[0,1]} that
+        defines the relative number of outliers (i.e., epsilon or h in
+        the contamination mixture distribution). Typically, it takes
+        values between 0 and 0.5 (but it is not restricted to this interval).}
+    \item{vu}{\code{[numeric]} value of the (area-level) random-effect
+        variance.}
+    \item{vu.contam}{\code{[numeric]} nonnegative value of the (area-level)
+        random-effect variance of the outlier part in the contamination
+        mixture distribution.}
+    \item{vu.epsilon}{\code{[numeric]} value in \eqn{[0,1]}{[0,1]} that
+        defines the relative number of outliers in the contamination
+        mixture distribution of the (area-level) random effects.}
 }
 \details{
     Let \eqn{y_i}{e[i]} denote an area-specific \eqn{n_i}{n[i]}-vector of
@@ -87,19 +89,22 @@ makedata(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20, areaID = NULL,
         }
 }
 \value{
-    Instance of the class \code{saemodel}.
+    An instance of the class \code{saemodel}.
 }
 \references{
 Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm
     for Large Datasets. \emph{Austrian Journal of Statistics} \bold{41},
-    243-265. \url{http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf}
+    243--265. \url{http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf}
 
 Stahel, W. A. and A. Welsh (1997).
     Approaches to robust estimation in the simplest variance components model.
-    \emph{Journal of Statistical Planning and Inference} \bold{57}, 295-319.
+    \emph{Journal of Statistical Planning and Inference} \bold{57}, 295--319.
     \doi{https://doi.org/10.1016/S0378-3758(96)00050-X}
 }
+\seealso{
+    \code{\link[=saemodel]{saemodel()}},
+    \code{\link[=fitsaemodel]{fitsaemodel()}}
+}
 \examples{
-# generate synthetic data
 mymodel <- makedata()
 }

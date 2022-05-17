@@ -1,4 +1,5 @@
-robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL)
+robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
+        progress_bar = TRUE)
 {
     if (!inherits(fit, "fit_model_b"))
         stop("fit must be of class 'fit_model_b'", call. = FALSE)
@@ -48,7 +49,8 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL)
         # compute mean square prediction error (bootstrap)
         if (!is.null(reps)) {
             stopifnot(is.numeric(reps), reps > 0)
-            mspe <- .mspe(fit, as.integer(reps), areameans, fixeff)
+            mspe <- .mspe(fit, as.integer(reps), areameans, fixeff,
+                progress_bar)
         }
     }
     rownames(fixeff) <- attr(model, "areaNames")
@@ -71,12 +73,15 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL)
     attr(result, "robustness") <- k
     attr(result, "fit") <- fit
     attr(result, "mspe") <- reps
-    class(result) <- "meanssaemodel"
+    class(result) <- "pred_model_b"
     result
 }
 # Bootstrap
-.mspe <- function(fit, reps, areameans, fixeff)
+.mspe <- function(fit, reps, areameans, fixeff, progress_bar)
 {
+    if (progress_bar)
+        p_bar <- txtProgressBar(max = reps, style = 3)
+
     theta <- sqrt(fit$theta)
     model <- attr(fit, "saemodel")
     Xbeta <- as.matrix(model$X) %*% fit$beta
@@ -96,11 +101,18 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL)
         # predict
         predicts[j, ] <- t(robpredict(tmp, areameans, k = 20000,
             reps = NULL)$means) - t(predrf)
+        # update progress bar
+        if (progress_bar)
+            setTxtProgressBar(p_bar, j)
     }
+    if (progress_bar)
+        close(p_bar)
+
     colMeans(predicts^2)
 }
 # S3 plot method
-plot.meanssaemodel <- function(x, y = NULL, type = "e", sort = NULL, ...)
+#FIXME:
+plot.pred_model_b <- function(x, y = NULL, type = "e", sort = NULL, ...)
 {
     # y is part of the generic (later, we will use y to allow plot comparison)
     fe <- x$fixeff
@@ -172,8 +184,8 @@ plot.meanssaemodel <- function(x, y = NULL, type = "e", sort = NULL, ...)
     }
 }
 # S3 print method
-print.meanssaemodel <- function(x, digits = max(3L, getOption("digits") - 3L),
-    ...)
+print.pred_model_b <- function(x, digits = max(3L, getOption("digits")
+    - 3L), ...)
 {
     cat("Robustly Estimated/Predicted Area-Level Means:\n")
 
@@ -188,7 +200,7 @@ print.meanssaemodel <- function(x, digits = max(3L, getOption("digits") - 3L),
         cat("(MSPE:", attr(x, "mspe"), "boostrap replicates)\n")
 }
 # S3 residual method to extract residuals
-residuals.meanssaemodel <- function(object, ...)
+residuals.pred_model_b <- function(object, ...)
 {
     object$res
 }

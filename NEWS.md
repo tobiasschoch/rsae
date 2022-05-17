@@ -16,8 +16,9 @@
   
 * The  function `coef.fit_model_b()` only returns the coefficients but does print to the console anymore. 
 * Function `fitsaemodel.control()` gained the additional argument `k_Inf` to specify the robustness tuning constant k that represents infinity (used to define the maximum likelihood estimator)
-* Argument `digit` of the functions `print.fit_model_b()` depends now on `getOption("digits")`.
-* Function `summary.fit_model_b()` returns now the model summary. 
+* Argument `digit` of the function `print.fit_model_b()` depends now on `getOption("digits")`.
+* Function `summary.fit_model_b()` returns now the model summary (in addition to printing to the console).
+* The progress bar in function `robpredict()` is now implemented with `utils:txtProgressBar()` and can be switched off using argument `progress_bar`.
 
 ## MISC
 

@@ -5,10 +5,9 @@
 \alias{as.matrix.saemodel}
 \title{Setting Up a SAE Model}
 \description{
-    \code{saemodel} is the workhorse function to set up a model (i.e., an
-    instance of the \code{"saemodel"} class). It is the starting point of
-    every model fitting exercise. Once a model has been initilized/ set up,
-    we consider estimating its parameter.
+    Function \code{saemodel()} is used to specify a model. Once a model
+    has been specified, it can be fitted using
+    \code{\link[=fitsaemodel]{fitsaemodel()}} by different estimation methods.
 }
 \usage{
 saemodel(formula, area, data, type = "b", na.omit = FALSE)
@@ -18,42 +17,66 @@ saemodel(formula, area, data, type = "b", na.omit = FALSE)
 \method{as.matrix}{saemodel}(x, ...)
 }
 \arguments{
-    \item{formula}{a two-sided linear formula object describing the
-        fixed-effects part, with the response on the RHS of the \code{~}
+    \item{formula}{a \code{formula} object of describing the fixed-effects
+        part of the model, with the response on the RHS of the \code{~}
         operator and the terms or regressors, separated by \code{+}
         operators, on the LHS of the formula.}
-    \item{area}{a one-sided formula object. A \code{~} operator
+    \item{area}{a one-sided \code{formula} object. A \code{~} operator
         followed by only one single term defining the area-specific
         random-effect part.}
     \item{data}{data.frame.}
-    \item{type}{either "a" or "b" refering to J.N.K. Rao's definition
-        of model type A (area-level model) or B (unit-level model);
-        default is \code{type="b"}.}
-    \item{na.omit}{a logical indicating whether \code{NA} should be removed
-        (default is \code{FALSE}). Note that none of the algorithms
-        can cope with missing values.}
-    \item{x}{an object of the class \code{"saemodel"} (this argument is
-        implicitly used by the \code{print} and \code{as.matrix} methods).}
-    \item{object}{an object of the class \code{"saemodel"} (this argument is
-        implicitly used by the \code{summary} method).}
-    \item{\dots}{not used.}
+    \item{type}{\code{[character]} \code{"a"} or \code{"b"} refering to
+        J.N.K. Rao's definition of model type A (area-level model) or B
+        (unit-level model); default is \code{"b"}.}
+    \item{na.omit}{\code{[logical]} indicating whether \code{NA} values
+        should be removed before the computation proceeds. Note that none
+        of the algorithms can cope with missing values.}
+    \item{x}{an object of class \code{"saemodel"}.}
+    \item{object}{an object of the class \code{"saemodel"}.}
+    \item{\dots}{additional arguments (not used).}
 }
 \details{
-    The step of setting up a SAE model is the starting point of any (robust)
-    SAE modeling exercise. (Use the makedata to generate a synthetic
-    dataset; see also, below). Here, we have to define the fixed-effects-
-    and random-effects part of the model, and to tell \code{R} what data
-    it shall use.
+    Function \code{saemodel()} is used to specify a model.
+    \itemize{
+        \item \code{model} is a symbolic description (\code{formula} of the
+            fixed-effects model to be fitted.
 
-    Once a model has been initilized/ set up, we consider estimating its
-    parameter; see \code{\link{fitsaemodel}}.
+            A typical model has the form \code{response ~ terms} where
+            \code{response} is the (numeric) response vector and
+            \code{terms} is a series of terms which specifies a linear
+            predictor for response (explanatory variables); see
+            \code{\link{formula}}.
+
+            A \code{formula} has an implied intercept term. To remove
+            this use either \code{y ~ x - 1} or \code{y ~ 0 + x};
+            see \code{\link{formula}} for more details of allowed formulae.
+        \item \code{area} is a symbolic description (\code{formula}) of
+            the random effects (nested error structure). It must be
+            right-hand side only formula consisting of one term,
+            e.g., \code{~ areaDefinition}.
+    }
+    The data must no contain missing values.
+
+    The design matrix (i.e., matrix of the explanatory variables
+    defined the right-hand side of \code{model}) must have full column
+    rank; otherwise execution is terminated by an error.
+
+    Once a model has been specified, it can be fitted by
+    \code{\link[=fitsaemodel]{fitsaemodel()}}.
 }
 \value{
-    Instance of the S3 class \code{"saemodel"}.
+    An instance of the S3 class \code{"saemodel"}
 }
 \references{
 Rao, J.N.K. (2003). \emph{Small Area Estimation}, New York: John Wiley and Sons.
 }
 \seealso{
-\code{\link{makedata}}
+    \code{\link[=makedata]{makedata()}},
+    \code{\link[=fitsaemodel]{fitsaemodel()}}
+}
+\examples{
+data("landsat")
+model <- saemodel(formula = HACorn ~ PixelsCorn + PixelsSoybeans,
+    area = ~CountyName,
+    data = subset(landsat, subset = (outlier == FALSE)))
 }

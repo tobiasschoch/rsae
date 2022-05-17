@@ -4,7 +4,7 @@
 ^\.gitattributes$
 ^\.gitignore$
 ^README\.md$
-^inst/TODO$
+^inst/TODO\.md$
 # tests
 ^tests$
 # varia

@@ -4,6 +4,7 @@ importFrom("graphics",
 importFrom("stats",
     "model.frame", "model.response", "model.matrix", "pnorm", "dnorm", "rnorm",
     "pt", "printCoefmat", "median")
+importFrom("utils", "setTxtProgressBar", "txtProgressBar")
 
 # saemodel
 export(saemodel)
@@ -22,9 +23,9 @@ S3method(print, summary_fit_model_b)
 
 # robpredict
 export(robpredict)
-S3method(print, meanssaemodel)
-S3method(plot, meanssaemodel)
-S3method(residuals, meanssaemodel)
+S3method(print, pred_model_b)
+S3method(plot, pred_model_b)
+S3method(residuals, pred_model_b)
 
 # varia
 export(convergence)
