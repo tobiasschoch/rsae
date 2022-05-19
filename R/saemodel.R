@@ -51,6 +51,7 @@ saemodel <- function(formula, area, data, type = "b", na.omit = FALSE)
     model <- list(X = mod[, 2:(p + 1)], y = mod[, 1], nsize = nsize,
         areaID = mod[, (p + 2)], g = length(nsize), p = p, n = length(y),
         intercept = attr(mt, "intercept"))
+    colnames(model$X) <- colnames(X)
     attr(model, "areaNames") <- levels(areaID)
     attr(model, "yname") <- paste(formula)[[2]]
     attr(model, "xnames") <- colnames(X)
@@ -69,10 +70,9 @@ print.saemodel <- function(x, ...)
 
     if (is.null(attr(x, "contam"))) {
         cat("SAE MODEL TYPE: B (J.N.K. Rao's classification)\n---\n")
-        cat(paste("FIXED EFFECTS: ", attr(x, "yname"), " ~ ", paste(attr(x,
-            "xnames"), collapse = " + "), sep = ""), "\n")
-        cat(paste("AREA-SPECIFIC RANDOM EFFECTS: ", attr(x, "areadef"),
-            sep = ""), "\n")
+        cat(paste0("FIXED EFFECTS: ", attr(x, "yname"), " ~ ",
+            paste0(attr(x, "xnames"), collapse = " + ")), "\n")
+        cat(paste0("AREA-SPECIFIC RANDOM EFFECTS: ", attr(x, "areadef")), "\n")
     } else {
         skeleton <- attr(x, "contam")$skeleton
         cat("SAE MODEL TYPE: B (J.N.K. Rao's classification)\n")

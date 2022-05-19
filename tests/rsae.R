@@ -13,7 +13,7 @@ m <- fitsaemodel("ml", bhfmodel)
 # check coefficients
 ref_coef <- list(fixeff = structure(c(50.96755698661854, 0.32858050698728736,
     -0.13370990402151223), .Dim = c(1L, 3L), .Dimnames = list("fixeff",
-    c("X.Intercept.", "PixelsCorn", "PixelsSoybeans"))), raneff =
+    c("(Intercept)", "PixelsCorn", "PixelsSoybeans"))), raneff =
     structure(c(137.31355346825936, 121.06196596142701), .Dim = 1:2,
     .Dimnames = list("raneff", c("ResidualVar", "AreaVar"))))
 expect_equal(ref_coef, coef(m), label = "mle: coef")
@@ -88,7 +88,7 @@ m <- fitsaemodel("huberm", bhfmodel, k = 1.5)
 # check coefficients
 ref_coef <- list(fixeff = structure(c(50.284889482233901, 0.32845339396860779,
     -0.1391586558157463), .Dim = c(1L, 3L), .Dimnames = list("fixeff",
-    c("X.Intercept.", "PixelsCorn", "PixelsSoybeans"))), raneff =
+    c("(Intercept)", "PixelsCorn", "PixelsSoybeans"))), raneff =
     structure(c(152.8651163493895, 142.89195559015775), .Dim = 1:2,
     .Dimnames = list("raneff", c("ResidualVar", "AreaVar"))))
 expect_equal(ref_coef, coef(m), label = "huberm: coef")

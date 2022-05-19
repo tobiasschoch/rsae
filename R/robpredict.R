@@ -105,6 +105,9 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
         # compute the model parameters using ml
         tmp <- fitsaemodel("ml", model)
         # predict
+
+#FIXME: seed, k
+
         tmp <- robpredict(tmp, areameans, k = 20000, reps = NULL, seed = seed,
             progress_bar = FALSE)
         predicts[i, ] <- t(tmp$means - predrf)

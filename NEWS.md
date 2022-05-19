@@ -19,7 +19,8 @@
 * Function `summary.fit_model_b()` returns now the model summary (in addition to printing to the console).
 * Function `robpredict()` 
   * The function gained the additional argument `seed`  to specify the random seed in the parametric bootstrap.
-  * The progress bar in function `robpredict()` is now implemented with `utils:txtProgressBar()` and can be switched off using  `progress_bar = FALSE`.
+  * The progress bar in function `robpredict()` is now implemented with `utils:txtProgressBar()` and can be switched off using  `progress_bar = FALSE`.
+* The column of ones of the matrix of independent variables (if there is an intercept), see slot `X` of an `saemodel` instance, is now called `(Intercept)` not `X.Intercept` .
 
 
 ## MISC
