@@ -20,7 +20,8 @@ convergence <- function(object)
     colnames(together) <- c("niter", "acc")
     rownames(together) <- c("overall loop", "fixeff", "residual var",
         "area raneff var")
-    cat("---\nUser specified number of iterations (niter) and\nnumeric precision (acc):\n\n")
+    cat(paste0("---\nUser specified number of iterations (niter) and\n",
+        "numeric precision (acc):\n\n"))
     print(together)
 
     #----------------------
@@ -29,7 +30,8 @@ convergence <- function(object)
     iters <- iters[rowSums(iters) != 0, , drop = FALSE]
     colnames(iters) <- c("fixeff", "residual var", "area raneff var")
     rownames(iters) <- 1:NROW(iters)
-    cat("---\nNumber of EE-specific iterations in each call\n(given the user-defined specs), reported for\neach of the",
-        NROW(iters), "overall iterations:\n\n")
+    cat(paste0("---\nNumber of EE-specific iterations in each call\n",
+        "(given the user-defined specs), reported for\n",
+        "each of the", NROW(iters), "overall iterations:\n\n"))
     print(iters)
 }

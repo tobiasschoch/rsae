@@ -5,12 +5,14 @@
 
 ## Summary
 
-The `rsae` package in an `R` ([R Core Team, 2022](#references)) package that provides functions to estimate the parameters of the basic unit-level model in small area estimation (also known as model type "B", see [Rao, 2003; Battese et al., 1988](#references)). In step 1, the model is fitted by one of the methods:
+The `rsae` package is an `R` ([R Core Team, 2022](#references)) package that provides functions to estimate the parameters of the basic unit-level model in small area estimation (also known as model type "B" in [Rao, 2003](#references),  or nested-error regression model in [Battese et al., 1988](#references)). 
+
+In step 1, the model is fitted by one of the methods:
 
 * maximum likelihood (see e.g., [Rao, 2003](#references), chapter 7.2),
 * M-estimation, which is robust against outliers; see [Schoch (2012)](#references).
 
-In step 2, the area-specific means are predicted using the empirical best linear unbiased predictor, EBLUP, or a robust prediction method due to [Copt and Victoria-Feser (2009)](#references). In addition, the mean square prediction error of the area-specific means can be computed by a parametric bootstrap.
+In step 2, the area-specific means are predicted using the empirical best linear unbiased predictor (EBLUP) or a robust prediction method due to [Copt and Victoria-Feser (2009)](#references). In addition, the mean square prediction error of the area-specific means can be computed by a parametric bootstrap.
 
 
 ## Installation

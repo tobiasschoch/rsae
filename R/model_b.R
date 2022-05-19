@@ -163,13 +163,13 @@ print.fit_model_b <- function (x, digits = max(3L, getOption("digits") - 3L),
 {
     # failure of convergence
     if (x$converged != 1) {
-        cat("THE ALGORITHM DID NOT CONVERGE!\n---\n")
-        cat("  1) use convergence() of your fitted model to learn more\n")
-        cat("  2) study the documentation using the command ?fitsaemodel\n")
-        cat("  3) you may call fitsaemodel with 'init' equal to (either) 'lts'\n")
-        cat("     or 's' (this works also for ML, though it may no be very efficient)\n")
-        cat("  4) if it still does not converge, the last resort is to modify\n")
-        cat("     'acc' and/or 'niter' (and hope and pray)\n\n")
+        cat(paste0("THE ALGORITHM DID NOT CONVERGE!\n---\n",
+            " 1) use convergence() of your fitted model to learn more\n",
+            " 2) study the documentation using the command ?fitsaemodel\n",
+            " 3) you may call fitsaemodel with 'init' equal to (either) 'lts'\n",
+            "    or 's' (this works also for ML, though it may no be very efficient)\n",
+            " 4) if it still does not converge, the last resort is to modify\n",
+            "   'acc' and/or 'niter'\n\n"))
     }
     # otherwise
     saemodel <- attr(x, "saemodel")
@@ -201,12 +201,12 @@ print.fit_model_b <- function (x, digits = max(3L, getOption("digits") - 3L),
     # warn if the raneff variance is almost zero
     if (!is.na(x$theta[2])){
         if (x$theta[2] <= .Machine$double.eps^(1 / 4)) {
-            cat("---\n")
-            cat("NOTE THAT THE VARIANCE OF THE AREA-LEVEL RANDOM\n")
-            cat("EFFECT IS ALMOST ZERO! DO YOU REALLY NEED THE\n")
-            cat("RANDOM EFFECT? IF SO, GO AHEAD. HOWEVER, YOU\n")
-            cat("SHOULD CONSIDER FITTING A (ROBUST) GLS MODEL.\n")
-            cat("---\n")
+            cat(paste0("---\n",
+            "NOTE THAT THE VARIANCE OF THE AREA-LEVEL RANDOM\n",
+            "EFFECT IS ALMOST ZERO! DO YOU REALLY NEED THE\n",
+            "RANDOM EFFECT? IF SO, GO AHEAD. HOWEVER, YOU\n",
+            "SHOULD CONSIDER FITTING A (ROBUST) GLS MODEL.\n",
+            "---\n"))
         }
     }
 

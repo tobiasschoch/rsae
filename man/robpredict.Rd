@@ -43,7 +43,7 @@ robpredict(fit, areameans = NULL, k = NULL, reps = NULL, seed = 1024,
         \code{seed} in \code{\link[=set.seed]{set.seed()}} to specify
         the random seed.}
     \item{progress_bar}{\code{[logical]} whether a progress bar is displayed
-        for the parametric bootstrap; default: \code{TRUE}.}
+        for the parametric bootstrap; see \bold{NOTE} below.}
     \item{x}{an object of class \code{"pred_model_b"}.}
     \item{digits}{\code{[integer]} number of digits to be printed by.}
     \item{type}{\code{[character]} type of \code{plot} method: \code{"e"}
@@ -102,6 +102,15 @@ robpredict(fit, areameans = NULL, k = NULL, reps = NULL, seed = 1024,
             }
         }
     }
+}
+\section{NOTE}{
+    Users of \code{Rgui.exe} on Windows are recommended to call
+    \code{robpredict()} with argument \code{progress_bar = FALSE}
+    because \code{Rgui.exe} does not handle calls to
+    \code{\link[=txtProgressBar]{txtProgressBar()}} well (the
+    execution time of the same job increases and it tends to stall the
+    execution of R). Users of \code{R-Studio} and \code{Rterm.exe}
+    are \bold{not} affected.
 }
 \value{
     An instance of the S3 class \code{pred_model_b}

@@ -4,8 +4,8 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     if (!inherits(fit, "fit_model_b"))
         stop("fit must be of class 'fit_model_b'", call. = FALSE)
     if (fit$converged == 0)
-        stop("Prediction is not possible because algorithm\nof fitted model did not converge\n\n",
-             call. = FALSE)
+        stop(paste0("Prediction is not possible because algorithm\n",
+            "of fitted model did not converge\n\n"), call. = FALSE)
 
     model <- attr(fit, "saemodel")          # sae model
     dec <- attr(fit, "dec")                 # type of decomposition
@@ -80,9 +80,14 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
 # Bootstrap
 .mspe <- function(fit, reps, areameans, fixeff, progress_bar)
 {
-    if (progress_bar)
+    if (progress_bar) {
+        # warn if Plattform = Rgui on Windows
+        if (.Platform$GUI == "Rgui")
+            warning(paste0("\nRecommendation: Use 'progress_bar = FALSE' because",
+                "\nRgui.exe has issues with txtProgressBar.\n\n"),
+                call. = FALSE, immediate. = TRUE)
         p_bar <- txtProgressBar(style = 3)
-
+    }
     theta <- sqrt(fit$theta)
     model <- attr(fit, "saemodel")
     Xbeta <- as.matrix(model$X) %*% fit$beta
