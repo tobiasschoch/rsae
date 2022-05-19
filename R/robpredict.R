@@ -81,7 +81,7 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
 .mspe <- function(fit, reps, areameans, fixeff, progress_bar)
 {
     if (progress_bar)
-        p_bar <- txtProgressBar(max = reps, style = 3)
+        p_bar <- txtProgressBar(style = 3)
 
     theta <- sqrt(fit$theta)
     model <- attr(fit, "saemodel")
@@ -100,13 +100,13 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
         # compute the model parameters using ml
         tmp <- fitsaemodel("ml", model)
         # predict
-        tmp <- robpredict(tmp, areameans, k = 20000, reps = NULL,
+        tmp <- robpredict(tmp, areameans, k = 20000, reps = NULL, seed = seed,
             progress_bar = FALSE)
         predicts[i, ] <- t(tmp$means - predrf)
 
         # update progress bar
         if (progress_bar)
-            setTxtProgressBar(p_bar, i)
+            setTxtProgressBar(p_bar, i / reps)
     }
     if (progress_bar)
         close(p_bar)
