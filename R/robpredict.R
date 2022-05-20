@@ -18,6 +18,7 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
         k <- k_fit
     else
         stopifnot(is.numeric(k), k > 0, is.finite(k))
+
     kappa <- .computekappa(k)               # consistency correction
     v <- fit$theta[1]                       # variance components
     d <- fit$theta[2] / v
@@ -50,8 +51,10 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
         if (!is.null(reps)) {
             stopifnot(is.numeric(reps), reps > 0, is.numeric(seed))
             set.seed(seed)
-            mspe <- .mspe(fit, as.integer(reps), areameans, fixeff,
+            tmp <- .mspe(fit, as.integer(reps), areameans, fixeff, k,
                 progress_bar)
+            mspe <- tmp$mspe
+            reps <- tmp$reps
         }
     }
     rownames(fixeff) <- attr(model, "areaNames")
@@ -77,8 +80,30 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     class(result) <- "pred_model_b"
     result
 }
-# Bootstrap
-.mspe <- function(fit, reps, areameans, fixeff, progress_bar)
+# prediction
+.pred_model_b <- function(fit, areameans, k)
+{
+    model <- attr(fit, "saemodel")          # sae model
+    dec <- attr(fit, "dec")                 # type of decomposition
+    kappa <- .computekappa(k)               # consistency correction
+    v <- fit$theta[1]                       # variance components
+    d <- fit$theta[2] / v
+    predre <- predfe <- rep(0, model$g)
+    tmp <- .Fortran("drsaehubpredict", n = as.integer(model$n),
+        p = as.integer(model$p), g = as.integer(model$g),
+        nsize = as.integer(model$nsize), k = as.double(k),
+        kappa = as.double(kappa), d = as.double(d), v = as.double(v),
+        beta = as.matrix(fit$beta), yvec = as.matrix(model$y),
+        xmat = as.matrix(model$X), predfe = as.matrix(predfe),
+        predre = as.matrix(predre), dec = as.integer(dec), PACKAGE = "rsae")
+    # predicted area-level random effects
+    raneff <- tmp$predre
+    fixeff <- as.matrix(areameans) %*% fit$beta
+    means <- raneff + fixeff
+    list(fixeff = fixeff, raneff = raneff, means = means)
+}
+# Bootstrap mean square prediction error
+.mspe <- function(fit, reps, areameans, fixeff, k, progress_bar)
 {
     if (progress_bar) {
         # warn if Plattform = Rgui on Windows
@@ -92,6 +117,7 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     model <- attr(fit, "saemodel")
     Xbeta <- as.matrix(model$X) %*% fit$beta
     predicts <- matrix(NA_real_, reps, model$g)
+    failures <- 0
     for (i in 1:reps) {
         # draw model error, e
         e <- rnorm(model$n, 0, theta[1])
@@ -104,14 +130,13 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
         model$y <- Xbeta + e + v
         # compute the model parameters using ml
         tmp <- fitsaemodel("ml", model)
-        # predict
-
-#FIXME: seed, k
-
-        tmp <- robpredict(tmp, areameans, k = 20000, reps = NULL, seed = seed,
-            progress_bar = FALSE)
-        predicts[i, ] <- t(tmp$means - predrf)
-
+        if (tmp$converged == 1) {
+            # predict
+            tmp <- .pred_model_b(fit, areameans, k)
+            predicts[i, ] <- t(tmp$means - predrf)
+        } else {
+            failures <- failures + 1
+        }
         # update progress bar
         if (progress_bar)
             setTxtProgressBar(p_bar, i / reps)
@@ -119,7 +144,7 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     if (progress_bar)
         close(p_bar)
 
-    colMeans(predicts^2)
+    list(mspe = colMeans(predicts^2, na.rm = TRUE), reps = reps - failures)
 }
 # S3 plot method
 plot.pred_model_b <- function(x, type = "e", sort = NULL, ...)
