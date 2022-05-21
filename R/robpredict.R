@@ -51,8 +51,7 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
         if (!is.null(reps)) {
             stopifnot(is.numeric(reps), reps > 0, is.numeric(seed))
             set.seed(seed)
-            tmp <- .mspe(fit, as.integer(reps), areameans, fixeff, k,
-                progress_bar)
+            tmp <- .mspe(fit, as.integer(reps), areameans, fixeff, progress_bar)
             mspe <- tmp$mspe
             reps <- tmp$reps
         }
@@ -81,8 +80,9 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     result
 }
 # prediction
-.pred_model_b <- function(fit, areameans, k)
+.pred_model_b <- function(fit, areameans)
 {
+    k <- fitsaemodel.control()$k_Inf        # k
     model <- attr(fit, "saemodel")          # sae model
     dec <- attr(fit, "dec")                 # type of decomposition
     kappa <- .computekappa(k)               # consistency correction
@@ -103,13 +103,14 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     list(fixeff = fixeff, raneff = raneff, means = means)
 }
 # Bootstrap mean square prediction error
-.mspe <- function(fit, reps, areameans, fixeff, k, progress_bar)
+.mspe <- function(fit, reps, areameans, fixeff, progress_bar)
 {
     if (progress_bar) {
-        # warn if Plattform = Rgui on Windows
-        if (.Platform$GUI == "Rgui")
-            warning(paste0("\nRecommendation: Use 'progress_bar = FALSE' because",
-                "\nRgui.exe has issues with txtProgressBar.\n\n"),
+        # warn if Plattform = Rgui and R version "4.2.0 unpached"
+        svn_rev <- as.numeric(R.Version()[["svn rev"]])
+        if (.Platform$GUI == "Rgui" && svn_rev > 82228 && svn_rev < 82389)
+            warning(paste0("\nUse 'progress_bar = FALSE' because Rgui.exe has\n",
+                "issues with txtProgressBar; also, consider updating R.\n\n"),
                 call. = FALSE, immediate. = TRUE)
         p_bar <- txtProgressBar(style = 3)
     }
@@ -129,10 +130,10 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
         # generate bootstrap samples (and fix it to the model)
         model$y <- Xbeta + e + v
         # compute the model parameters using ml
-        tmp <- fitsaemodel("ml", model)
-        if (tmp$converged == 1) {
+        new_fit <- fitsaemodel("ml", model)
+        if (new_fit$converged == 1) {
             # predict
-            tmp <- .pred_model_b(fit, areameans, k)
+            tmp <- .pred_model_b(new_fit, areameans)
             predicts[i, ] <- t(tmp$means - predrf)
         } else {
             failures <- failures + 1

@@ -61,12 +61,8 @@ saemodel <- function(formula, area, data, type = "b", na.omit = FALSE)
 # S3 print method
 print.saemodel <- function(x, ...)
 {
-
-    # distinguish synthetic (potentially contaminated) from ordinary data
-
-    #FIXME: this distinction must be done at the stage of model generation
-    #       makedata and saemodel, respectively; the print method should only
-    #       print
+    #FIXME: the print method should only print; do preparations of strings
+    # in saemodel() and makedata()
 
     if (is.null(attr(x, "contam"))) {
         cat("SAE MODEL TYPE: B (J.N.K. Rao's classification)\n---\n")
