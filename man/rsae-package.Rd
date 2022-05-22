@@ -28,7 +28,7 @@
         Data analysis involves the following steps:
         \enumerate{
             \item prepare the data/ specify the model for estimation;
-                see \code{\link[saemodel]{saemodel()}}
+                see \code{\link[=saemodel]{saemodel()}}
             \item fit the model by various (robust) methods; see
                 \code{\link[=fitsaemodel]{fitsaemodel()}}
             \item (robustly) predict the random effects and the area

@@ -4,7 +4,7 @@ Title: Robust Small Area Estimation
 Version: 0.1-6
 Authors@R: c(
     person("Tobias", "Schoch", role = c("aut", "cre"),
-        email = "tobias.schoch@gmail.com",
+        email = "tobias.schoch@fhnw.ch",
         comment = c(ORCID = "0000-0002-1640-3395")),
     person("Brent", "Richard", role = c("cph"), comment = "F77 code zeroin.f"))
 Description: The package implements maximum likelihood and outlier-robust
