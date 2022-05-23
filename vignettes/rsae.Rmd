@@ -1,11 +1,11 @@
 ---
-title: "Vignette: Robust Estimation Under the Unit-Level SAE Model"
+title: "Robust Estimation and Prediction Under the Unit-Level SAE Model"
 author: "Tobias Schoch"
 output:
     html_document:
         highlight: tango
 vignette: >
-  %\VignetteIndexEntry{Robust Estimation Under the Unit-Level SAE Model}
+  %\VignetteIndexEntry{Robust Estimation and Prediction Under the Unit-Level SAE Model}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -66,7 +66,7 @@ This vignette is organized as follows:
 **Citable companion paper of the package**
 </p>
 <p>
-Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* 41(4), pp. 243-265.
+Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* 41(4), pp. 243--265. [URL: www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf](http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf)
 </p>
 </div>
 
@@ -114,7 +114,7 @@ data("landsat")
 The `landsat` data is a compilation of survey and satellite data from [Battese et al. (1988)](#biblio). It consists of data on segments (primary sampling unit; 1 segement approx. 250 hectares) under corn and soybeans for 12 counties in north-central Iowa.
 
 * The survey data on the areas under corn and soybeans (reported in hectares) in the 37 segments of the 12 counties have been determined by USDA Statistical Reporting Service staff, who interviewed farm operators. A segment is about 250 hectares.
-* For the LANDSAT satellite data, information is recorded as "pixels". A pixel is about 0.45 hectares. 
+* For the LANDSAT satellite data, information is recorded as "pixels". A pixel is about 0.45 hectares.
 
 In the three smallest counties (Cerro Gordo, Hamilton, and Worth), data is available only for one sample segment. All other counties have data for more than one sample segment (i.e., unbalanced data). The largest area (Hardin) covers six units.
 
@@ -124,7 +124,7 @@ The data for the observations 32, 33, and 34 are shown below
 landsat[32:34,]
 ```
 
-We added the variable `outlier` to the original data. It flags observation 33 as an outlier, which is in line with the discussion in [Battese et al. (1988)](#biblio). 
+We added the variable `outlier` to the original data. It flags observation 33 as an outlier, which is in line with the discussion in [Battese et al. (1988)](#biblio).
 
 ## 3 Model specification
 
@@ -133,7 +133,7 @@ We consider estimating the parameters of the basic unit-level model ([Battese et
 $$
 \begin{equation*}
     \mathrm{HACorn}_{i,j} = \alpha + \beta_1 \mathrm{PixelsCorn}_{i,j}
-    + \beta_2 \mathrm{PixelsSoybeans}_{i,j} + u_i + e_{i,j}, 
+    + \beta_2 \mathrm{PixelsSoybeans}_{i,j} + u_i + e_{i,j},
 \end{equation*}
 $$
 
@@ -154,15 +154,15 @@ bhfmodel <- saemodel(formula = HACorn ~ PixelsCorn + PixelsSoybeans,
 
 where
 
-* `formula` defines the fixed-effect part of the model (the `~` operator separates dependent and independent variables; by default, the model includes a regression intercept), 
-* `area` specifies the area-level random effect (variable `CountyName` serves as area identifier; note that the argument `area` is also a `formula` object), 
-* `data` specifies the `data.frame` (here, we consider the subset of observations that are not flagged as outliers). 
+* `formula` defines the fixed-effect part of the model (the `~` operator separates dependent and independent variables; by default, the model includes a regression intercept),
+* `area` specifies the area-level random effect (variable `CountyName` serves as area identifier; note that the argument `area` is also a `formula` object),
+* `data` specifies the `data.frame` (here, we consider the subset of observations that are not flagged as outliers).
 
 If you need to know more about a particular model, you can use the `summary()` method.
 
 ## 4 Parameter estimation
 
-Having specified `bhfmodel`, we consider estimating its parameters by different estimation method. 
+Having specified `bhfmodel`, we consider estimating its parameters by different estimation method.
 
 ### 4.1 Maximum-likelihood estimation
 
@@ -193,7 +193,7 @@ Inferential statistics for the object `mlfit` are computed by the `summary()` me
 summary(mlfit)
 ```
 
-Function `coef()` extracts the estimated coefficients from a fitted model. 
+Function `coef()` extracts the estimated coefficients from a fitted model.
 
 * By default, function `coef()` is called with argument `type = "both"`, which implies that the fixed effects and the random effect variances are returned.
 * Calling the function with `type = "ranef"` or `type = "fixef"` returns the random effect variances or the fixed effects, respectively.
@@ -241,9 +241,8 @@ huberfit
 **Good to know. Selection of robustness tuning constant**
 </p>
 <p>
-In the simple location-scale model, the tuning constant `k = 1.345` defines an *M*-estimator of location that has an asymptotic relative efficiency w.r.t. the ML estimate of approx. 95\% at the Gaussian core model. This property does *not* directly carry over to robust estimators of mixed-linear models. Therfore, we should not blindly select `k = 1.345`.
+In the simple location-scale model, the tuning constant `k = 1.345` defines an *M*-estimator of location that has an asymptotic relative efficiency w.r.t. the ML estimate of approx. 95\% at the Gaussian core model. This property does *not* directly carry over to robust estimators of mixed-linear models. Therefore, we should not blindly select `k = 1.345`.
 </p></div>
-
 
 If the algorithm did not converge, see paragraph *safe mode* (below) and [Appendix](#appendix). Inferential statistics for `huberfit` are computed by the `summary()` method.
 
@@ -271,7 +270,7 @@ in the call of `fitsaemodel()`.  The safe mode uses a couple of internal tests t
 The package implements the following methods to predict the area-level means:
 
 * empirical best linear unbiased predictor (EBLUP); see [Rao (2003, Chapter 7.2)](#biblio),
-* robust prediction method of [Copt and Victoria-Feser (2009)](#biblio); see also [Heritier et al. (2009, p. 113-114)](#biblio). 
+* robust prediction method of [Copt and Victoria-Feser (2009)](#biblio); see also [Heritier et al. (2009, p. 113--114)](#biblio).
 
 <div class="my-sidebar-blue">
 <p style="color: #1f618d;">
@@ -282,7 +281,7 @@ The implemented robust prediction method is different from the method of [Sinha 
 </p>
 </div>
 
-EBLUP and robust predictions are computed by 
+EBLUP and robust predictions are computed by
 
 ```{r, eval = FALSE}
 robpredict(fit, areameans = NULL, k = NULL, reps = NULL, progress_bar = TRUE)
@@ -290,9 +289,8 @@ robpredict(fit, areameans = NULL, k = NULL, reps = NULL, progress_bar = TRUE)
 
 where
 
-* `fit` is a fitted model (ML estimate or *M*-estimate), 
+* `fit` is a fitted model (ML estimate or *M*-estimate),
 * `k` is the robustness tuning constant of the Huber $\psi$-function for robust prediction. By default `k` is `NULL` which means that the procedure inherits the tuning constant `k` that has been used in fitting the model; see `fitsaemodel()`. For the ML estimator, $k$ is taken as a large value that "represents" infinity; see argument `k_Inf` in `fitsaemodel.control()`.
-
 * `reps` and `progress_bar` are used in the computation of the mean square prediction error (see below).
 
 <div class="my-sidebar-blue">
@@ -305,8 +303,6 @@ The robustness-tuning constant `k` does not necessarily have to be the same as t
 If `areameans = NULL`, the prediction is based on the same data that have been used in estimating the model parameters (i.e., within-sample prediction). This is rarely used in SAE.
 </p>
 </div>
-
-
 
 In the `landsat` data, the county-specific population means of pixels of the segments under corn and soybeans are recorded in the variables MeanPixelsCorn and MeanPixelsSoybeans, respectively. Each sample segment in a particular county is assigned the county-specific means. Therefore, the population mean of the variables MeanPixelsCorn and MeanPixelsSoybeans occurs $n_i$ times. The unique county-specific population means are obtained using
 
@@ -323,19 +319,23 @@ The first column of `dat` is a dummy variable (because `bhfmodel` has a regressi
 Consider the ML estimate, `mlfit`, of the `bhfmodel` model. The EBLUP of the area-level means is computed by
 
 ```{r}
-robpredict(mlfit, areameans = dat)
+pred <- robpredict(mlfit, areameans = dat)
+pred
 ```
 
 because (by default) `k = NULL` .  By explicitly specifying `k` in the call of `robpredict()`, we can—in principle—compute robust predictions for the ML estimate instead of the EBLUP.
 
 Consider the Huber *M*-estimate `huberfit` (with tuning constant `k = 1.5`, see call of above). If `k` is not specified in the call of `robpredict()`, robust predictions are computed with $k$  equal to 1.5; otherwise, the robust predictions are based on the value of `k` in the call of `robpredict()`.
 
+Object `pred` is a `list` with slots `"fixeff"`, `"raneff"`, `"means"`, `"mspe"`, etc. For instance, the predicted means can be extracted by `pred$means` or `pred[["means"]]`.
+
 A `plot()` function is available to display the predicted means.
+
+Function `residuals()` computes the residuals.
 
 ### 6 Mean square prediction error
 
-Function `robpredict()` can be used to compute
-bootstrap estimates of the mean squared prediction errors (MSPE) of the predicted area-level means; see [Sinha and Rao (2009)](#biblio). To compute the MSPE, we must specify the number of bootstrap replicates `(reps)`.  If `reps = NULL`, the MSPE is not computed.
+Function `robpredict()` can be used to compute bootstrap estimates of the mean squared prediction errors (MSPE) of the predicted area-level means; see [Sinha and Rao (2009)](#biblio). To compute the MSPE, we must specify the number of bootstrap replicates `(reps)`.  If `reps = NULL`, the MSPE is not computed.
 
 Consider (for instance) the ML estimate. EBLUP and MSPE of the EBLUP based on 100 bootstrap replicates are computed by
 
@@ -347,37 +347,35 @@ pred
 
 The number of `reps = 100` is kept small for illustration purposes; in practice, we should choose larger values. The progress bar has been disabled as it is not suitable for the automatic vignette generation.
 
-A visual display of the predicted area-level means obtains by `plot(pred, type = "l", sort = "means")`. 
-
-Function `residuals()` computes the residuals.
+A visual display of the predicted area-level means obtains by `plot(pred, type = "l", sort = "means")`.
 
 ## References {#biblio}
 
 COPT, S. <span style="font-variant:small-caps;">and</span> M.-P. VICTORIA-FESER (2009). *Robust prediction in mixed linear models*, Tech. rep., University of Geneva.
 
-BATTESE, G. E., R. M. HARTER <span style="font-variant:small-caps;">and</span> W. A. FULLER (1988). An error component model for prediction of county crop areas using, *Journal of the American Statistical Association* **83**, 28--36.
+BATTESE, G. E., R. M. HARTER <span style="font-variant:small-caps;">and</span> W. A. FULLER (1988). An error component model for prediction of county crop areas using, *Journal of the American Statistical Association* **83**, 28--36. [DOI: 10.2307/2288915](https://doi.org/10.2307/2288915)
 
-FELLNER, W. H. (1986). Robust estimation of variance components, *Technometrics* **28**, 51--60.
+FELLNER, W. H. (1986). Robust estimation of variance components, *Technometrics* **28**, 51--60. [DOI: 10.1080/00401706.1986.10488097](https://doi.org/10.1080/00401706.1986.10488097)
 
 HERITIER, S., E. CANTONI, S. COPT, <span style="font-variant:small-caps;">and</span> M.-P. VICTORIA-FESER (2009). *Robust Methods in Biostatistics*, New York: John Wiley & Sons.
 
-MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO <span style="font-variant:small-caps;">and</span> M. A. DI PALMA (2021). *robustbase: Basic Robust Statistics*. R package version 0.93-9. URL http://CRAN.R-project.org/package=robustbase.
+MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO <span style="font-variant:small-caps;">and</span> M. A. DI PALMA (2021). *robustbase: Basic Robust Statistics*. R package version 0.93-9. [URL: CRAN.R-project.org/package=robustbase](http://CRAN.R-project.org/package=robustbase).
 
 RAO, J.N.K. (2003). *Small Area Estimation*, New York: John Wiley and Sons.
 
-RICHARDSON, A. M. <span style="font-variant:small-caps;">and</span> A. H. WELSH (1995). Robust Restricted Maximum Likelihood in Mixed Linear Models, *Biometrics* **51**, 1429--1439.
+RICHARDSON, A. M. <span style="font-variant:small-caps;">and</span> A. H. WELSH (1995). Robust Restricted Maximum Likelihood in Mixed Linear Models, *Biometrics* **51**, 1429--1439. [DOI: 10.2307/2533273](https://doi.org/10.2307/2533273)
 
-ROUSSEEUW, P. J. (1984). Least Median of Squares Regression, *Journal of the American Statistical Association* **79**, 871--880.
+ROUSSEEUW, P. J. (1984). Least Median of Squares Regression, *Journal of the American Statistical Association* **79**, 871--880. [DOI: 10.2307/2288718](https://doi.org/10.2307/2288718)
 
-ROUSSEEUW, P. J. <span style="font-variant:small-caps;">and</span> K. VAN DRIESSEN (2006). Computing LTS Regression for Large Data Sets, *Data Mining and Knowledge Discovery* **12**, 29--45.
+ROUSSEEUW, P. J. <span style="font-variant:small-caps;">and</span> K. VAN DRIESSEN (2006). Computing LTS Regression for Large Data Sets, *Data Mining and Knowledge Discovery* **12**, 29--45. [DOI: 10.1007/s10618-005-0024-4](https://doi.org/10.1007/s10618-005-0024-4)
 
 ROUSSEEUW, P. J. <span style="font-variant:small-caps;">and</span> V. YOHAI (1984). Robust Regression by Means of S Estimators, in *Robust and Nonlinear Time Series Analysis*, ed. by FRANKE, J., W. HÄRDLE AND R. D. MARTIN, New York: Springer, 256--274.
 
-SALIBIAN-BARRERA, M. <span style="font-variant:small-caps;">and</span> V. J. YOHAI (2006). A Fast Algorithm for S-Regression Estimates, *Journal of Computational and Graphical Statistics* **15**, 414--427.
+SALIBIAN-BARRERA, M. <span style="font-variant:small-caps;">and</span> V. J. YOHAI (2006). A Fast Algorithm for S-Regression Estimates, *Journal of Computational and Graphical Statistics* **15**, 414--427. [DOI: 10.1198/106186006x113629](https://doi.org/10.1198/106186006x113629)
 
-SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* **41**, 243--265.
+SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* **41**, 243--265. [URL: www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf](http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf)
 
-SINHA, S.K. <span style="font-variant:small-caps;">and</span> J.N.K. RAO (2009). Robust small area estimation. *Canadian Journal of Statistics* **37**, 381--399.
+SINHA, S.K. <span style="font-variant:small-caps;">and</span> J.N.K. RAO (2009). Robust small area estimation. *Canadian Journal of Statistics* **37**, 381--399. [DOI: 10.1002/cjs.10029](https://doi.org/10.1002/cjs.10029)
 
 ## Appendix
 
@@ -389,16 +387,15 @@ Suppose that we computed
 est <- fitsaemodel("ml", bhfmodel, niter = 3)
 ```
 
- The algorithm did not converge and we get the following output
+The algorithm did not converge and we get the following output
 
 ```{r}
 est
 ```
 
-
 To learn more, we call `convergence(est)` and get
 
-```{r, echo = FALSE}
+```{r}
 convergence(est)
 ```
 

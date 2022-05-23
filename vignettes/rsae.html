@@ -12,7 +12,7 @@
 <meta name="author" content="Tobias Schoch" />
 
 
-<title>Vignette: Robust Estimation Under the Unit-Level SAE Model</title>
+<title>Robust Estimation and Prediction Under the Unit-Level SAE Model</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -219,6 +219,7 @@ window.buildTabsets = function(tocID) {
     </style>
 
 
+
 <style type="text/css">
   code {
     white-space: pre;
@@ -341,6 +342,9 @@ button.code-folding-btn:focus {
 summary {
   display: list-item;
 }
+details > summary > p:only-child {
+  display: inline;
+}
 pre code {
   padding: 0;
 }
@@ -423,7 +427,7 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">Vignette: Robust Estimation Under the Unit-Level SAE Model</h1>
+<h1 class="title toc-ignore">Robust Estimation and Prediction Under the Unit-Level SAE Model</h1>
 <h4 class="author">Tobias Schoch</h4>
 
 </div>
@@ -470,7 +474,7 @@ pre code {
 <strong>Citable companion paper of the package</strong>
 </p>
 <p>
-Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. <em>Austrian Journal of Statistics</em> 41(4), pp. 243-265.
+Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. <em>Austrian Journal of Statistics</em> 41(4), pp. 243–265. <a href="http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf">URL: www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf</a>
 </p>
 </div>
 </div>
@@ -531,7 +535,7 @@ The implemented <em>M</em>-estimator is the RML II estimator of <a href="#biblio
 <p><span class="math display">\[
 \begin{equation*}
     \mathrm{HACorn}_{i,j} = \alpha + \beta_1 \mathrm{PixelsCorn}_{i,j}
-    + \beta_2 \mathrm{PixelsSoybeans}_{i,j} + u_i + e_{i,j}, 
+    + \beta_2 \mathrm{PixelsSoybeans}_{i,j} + u_i + e_{i,j},
 \end{equation*}
 \]</span></p>
 <p>where <span class="math inline">\(j=1,\ldots, n_i\)</span>, <span class="math inline">\(i=1, \ldots,12\)</span>, and</p>
@@ -671,7 +675,7 @@ The report indicates that the random-effect variance is close to zero or equal t
 <strong>Good to know. Selection of robustness tuning constant</strong>
 </p>
 <p>
-In the simple location-scale model, the tuning constant <code>k = 1.345</code> defines an <em>M</em>-estimator of location that has an asymptotic relative efficiency w.r.t. the ML estimate of approx. 95% at the Gaussian core model. This property does <em>not</em> directly carry over to robust estimators of mixed-linear models. Therfore, we should not blindly select <code>k = 1.345</code>.
+In the simple location-scale model, the tuning constant <code>k = 1.345</code> defines an <em>M</em>-estimator of location that has an asymptotic relative efficiency w.r.t. the ML estimate of approx. 95% at the Gaussian core model. This property does <em>not</em> directly carry over to robust estimators of mixed-linear models. Therefore, we should not blindly select <code>k = 1.345</code>.
 </p>
 </div>
 <p>If the algorithm did not converge, see paragraph <em>safe mode</em> (below) and <a href="#appendix">Appendix</a>. Inferential statistics for <code>huberfit</code> are computed by the <code>summary()</code> method.</p>
@@ -713,7 +717,7 @@ In the simple location-scale model, the tuning constant <code>k = 1.345</code> d
 <p>The package implements the following methods to predict the area-level means:</p>
 <ul>
 <li>empirical best linear unbiased predictor (EBLUP); see <a href="#biblio">Rao (2003, Chapter 7.2)</a>,</li>
-<li>robust prediction method of <a href="#biblio">Copt and Victoria-Feser (2009)</a>; see also <a href="#biblio">Heritier et al. (2009, p. 113-114)</a>.</li>
+<li>robust prediction method of <a href="#biblio">Copt and Victoria-Feser (2009)</a>; see also <a href="#biblio">Heritier et al. (2009, p. 113–114)</a>.</li>
 </ul>
 <div class="my-sidebar-blue">
 <p style="color: #1f618d;">
@@ -727,9 +731,9 @@ The implemented robust prediction method is different from the method of <a href
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">robpredict</span>(fit, <span class="at">areameans =</span> <span class="cn">NULL</span>, <span class="at">k =</span> <span class="cn">NULL</span>, <span class="at">reps =</span> <span class="cn">NULL</span>, <span class="at">progress_bar =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>where</p>
 <ul>
-<li><p><code>fit</code> is a fitted model (ML estimate or <em>M</em>-estimate),</p></li>
-<li><p><code>k</code> is the robustness tuning constant of the Huber <span class="math inline">\(\psi\)</span>-function for robust prediction. By default <code>k</code> is <code>NULL</code> which means that the procedure inherits the tuning constant <code>k</code> that has been used in fitting the model; see <code>fitsaemodel()</code>. For the ML estimator, <span class="math inline">\(k\)</span> is taken as a large value that “represents” infinity; see argument <code>k_Inf</code> in <code>fitsaemodel.control()</code>.</p></li>
-<li><p><code>reps</code> and <code>progress_bar</code> are used in the computation of the mean square prediction error (see below).</p></li>
+<li><code>fit</code> is a fitted model (ML estimate or <em>M</em>-estimate),</li>
+<li><code>k</code> is the robustness tuning constant of the Huber <span class="math inline">\(\psi\)</span>-function for robust prediction. By default <code>k</code> is <code>NULL</code> which means that the procedure inherits the tuning constant <code>k</code> that has been used in fitting the model; see <code>fitsaemodel()</code>. For the ML estimator, <span class="math inline">\(k\)</span> is taken as a large value that “represents” infinity; see argument <code>k_Inf</code> in <code>fitsaemodel.control()</code>.</li>
+<li><code>reps</code> and <code>progress_bar</code> are used in the computation of the mean square prediction error (see below).</li>
 </ul>
 <div class="my-sidebar-blue">
 <p style="color: #1f618d;">
@@ -761,24 +765,27 @@ If <code>areameans = NULL</code>, the prediction is based on the same data that 
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>Hardin               <span class="dv">1</span>         <span class="fl">325.99</span>             <span class="fl">177.05</span></span></code></pre></div>
 <p>The first column of <code>dat</code> is a dummy variable (because <code>bhfmodel</code> has a regression intercept). The second and third column represent, respectively, the county-specific population means of segments under corn and soybeans.</p>
 <p>Consider the ML estimate, <code>mlfit</code>, of the <code>bhfmodel</code> model. The EBLUP of the area-level means is computed by</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">robpredict</span>(mlfit, <span class="at">areameans =</span> dat)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>Robustly Estimated<span class="sc">/</span>Predicted Area<span class="sc">-</span>Level Means<span class="sc">:</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>             raneff   fixeff   area mean</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>Cerro Gordo   <span class="sc">-</span><span class="fl">0.348</span>  <span class="fl">122.629</span>  <span class="fl">122.281</span>  </span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>Hamilton       <span class="fl">2.731</span>  <span class="fl">123.379</span>  <span class="fl">126.110</span>  </span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>Worth        <span class="sc">-</span><span class="fl">11.522</span>  <span class="fl">118.677</span>  <span class="fl">107.154</span>  </span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>Humboldt      <span class="sc">-</span><span class="fl">8.313</span>  <span class="fl">117.053</span>  <span class="fl">108.741</span>  </span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>Franklin      <span class="fl">13.641</span>  <span class="fl">130.380</span>  <span class="fl">144.021</span>  </span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>Pocahontas     <span class="fl">9.529</span>  <span class="fl">102.425</span>  <span class="fl">111.954</span>  </span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>Winnebago     <span class="sc">-</span><span class="fl">9.043</span>  <span class="fl">122.052</span>  <span class="fl">113.009</span>  </span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>Wright         <span class="fl">1.648</span>  <span class="fl">120.358</span>  <span class="fl">122.006</span>  </span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>Webster       <span class="fl">11.082</span>  <span class="fl">104.073</span>  <span class="fl">115.155</span>  </span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>Hancock       <span class="sc">-</span><span class="fl">3.229</span>  <span class="fl">127.671</span>  <span class="fl">124.442</span>  </span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>Kossuth      <span class="sc">-</span><span class="fl">14.621</span>  <span class="fl">121.740</span>  <span class="fl">107.119</span>  </span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>Hardin         <span class="fl">8.445</span>  <span class="fl">134.408</span>  <span class="fl">142.853</span>  </span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> pred <span class="ot">&lt;-</span> <span class="fu">robpredict</span>(mlfit, <span class="at">areameans =</span> dat)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> pred</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>Robustly Estimated<span class="sc">/</span>Predicted Area<span class="sc">-</span>Level Means<span class="sc">:</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>             raneff   fixeff   area mean</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>Cerro Gordo   <span class="sc">-</span><span class="fl">0.348</span>  <span class="fl">122.629</span>  <span class="fl">122.281</span>  </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>Hamilton       <span class="fl">2.731</span>  <span class="fl">123.379</span>  <span class="fl">126.110</span>  </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>Worth        <span class="sc">-</span><span class="fl">11.522</span>  <span class="fl">118.677</span>  <span class="fl">107.154</span>  </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>Humboldt      <span class="sc">-</span><span class="fl">8.313</span>  <span class="fl">117.053</span>  <span class="fl">108.741</span>  </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>Franklin      <span class="fl">13.641</span>  <span class="fl">130.380</span>  <span class="fl">144.021</span>  </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>Pocahontas     <span class="fl">9.529</span>  <span class="fl">102.425</span>  <span class="fl">111.954</span>  </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>Winnebago     <span class="sc">-</span><span class="fl">9.043</span>  <span class="fl">122.052</span>  <span class="fl">113.009</span>  </span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>Wright         <span class="fl">1.648</span>  <span class="fl">120.358</span>  <span class="fl">122.006</span>  </span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>Webster       <span class="fl">11.082</span>  <span class="fl">104.073</span>  <span class="fl">115.155</span>  </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>Hancock       <span class="sc">-</span><span class="fl">3.229</span>  <span class="fl">127.671</span>  <span class="fl">124.442</span>  </span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>Kossuth      <span class="sc">-</span><span class="fl">14.621</span>  <span class="fl">121.740</span>  <span class="fl">107.119</span>  </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>Hardin         <span class="fl">8.445</span>  <span class="fl">134.408</span>  <span class="fl">142.853</span>  </span></code></pre></div>
 <p>because (by default) <code>k = NULL</code> . By explicitly specifying <code>k</code> in the call of <code>robpredict()</code>, we can—in principle—compute robust predictions for the ML estimate instead of the EBLUP.</p>
 <p>Consider the Huber <em>M</em>-estimate <code>huberfit</code> (with tuning constant <code>k = 1.5</code>, see call of above). If <code>k</code> is not specified in the call of <code>robpredict()</code>, robust predictions are computed with <span class="math inline">\(k\)</span> equal to 1.5; otherwise, the robust predictions are based on the value of <code>k</code> in the call of <code>robpredict()</code>.</p>
+<p>Object <code>pred</code> is a <code>list</code> with slots <code>&quot;fixeff&quot;</code>, <code>&quot;raneff&quot;</code>, <code>&quot;means&quot;</code>, <code>&quot;mspe&quot;</code>, etc. For instance, the predicted means can be extracted by <code>pred$means</code> or <code>pred[[&quot;means&quot;]]</code>.</p>
 <p>A <code>plot()</code> function is available to display the predicted means.</p>
+<p>Function <code>residuals()</code> computes the residuals.</p>
 <div id="mean-square-prediction-error" class="section level3">
 <h3>6 Mean square prediction error</h3>
 <p>Function <code>robpredict()</code> can be used to compute bootstrap estimates of the mean squared prediction errors (MSPE) of the predicted area-level means; see <a href="#biblio">Sinha and Rao (2009)</a>. To compute the MSPE, we must specify the number of bootstrap replicates <code>(reps)</code>. If <code>reps = NULL</code>, the MSPE is not computed.</p>
@@ -803,24 +810,23 @@ If <code>areameans = NULL</code>, the prediction is based on the same data that 
 <span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>(MSPE<span class="sc">:</span> <span class="dv">100</span> boostrap replicates)</span></code></pre></div>
 <p>The number of <code>reps = 100</code> is kept small for illustration purposes; in practice, we should choose larger values. The progress bar has been disabled as it is not suitable for the automatic vignette generation.</p>
 <p>A visual display of the predicted area-level means obtains by <code>plot(pred, type = &quot;l&quot;, sort = &quot;means&quot;)</code>.</p>
-<p>Function <code>residuals()</code> computes the residuals.</p>
 </div>
 </div>
 <div id="biblio" class="section level2">
 <h2>References</h2>
 <p>COPT, S. <span class="smallcaps">and</span> M.-P. VICTORIA-FESER (2009). <em>Robust prediction in mixed linear models</em>, Tech. rep., University of Geneva.</p>
-<p>BATTESE, G. E., R. M. HARTER <span class="smallcaps">and</span> W. A. FULLER (1988). An error component model for prediction of county crop areas using, <em>Journal of the American Statistical Association</em> <strong>83</strong>, 28–36.</p>
-<p>FELLNER, W. H. (1986). Robust estimation of variance components, <em>Technometrics</em> <strong>28</strong>, 51–60.</p>
+<p>BATTESE, G. E., R. M. HARTER <span class="smallcaps">and</span> W. A. FULLER (1988). An error component model for prediction of county crop areas using, <em>Journal of the American Statistical Association</em> <strong>83</strong>, 28–36. <a href="https://doi.org/10.2307/2288915">DOI: 10.2307/2288915</a></p>
+<p>FELLNER, W. H. (1986). Robust estimation of variance components, <em>Technometrics</em> <strong>28</strong>, 51–60. <a href="https://doi.org/10.1080/00401706.1986.10488097">DOI: 10.1080/00401706.1986.10488097</a></p>
 <p>HERITIER, S., E. CANTONI, S. COPT, <span class="smallcaps">and</span> M.-P. VICTORIA-FESER (2009). <em>Robust Methods in Biostatistics</em>, New York: John Wiley &amp; Sons.</p>
-<p>MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO <span class="smallcaps">and</span> M. A. DI PALMA (2021). <em>robustbase: Basic Robust Statistics</em>. R package version 0.93-9. URL <a href="http://CRAN.R-project.org/package=robustbase" class="uri">http://CRAN.R-project.org/package=robustbase</a>.</p>
+<p>MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO <span class="smallcaps">and</span> M. A. DI PALMA (2021). <em>robustbase: Basic Robust Statistics</em>. R package version 0.93-9. <a href="http://CRAN.R-project.org/package=robustbase">URL: CRAN.R-project.org/package=robustbase</a>.</p>
 <p>RAO, J.N.K. (2003). <em>Small Area Estimation</em>, New York: John Wiley and Sons.</p>
-<p>RICHARDSON, A. M. <span class="smallcaps">and</span> A. H. WELSH (1995). Robust Restricted Maximum Likelihood in Mixed Linear Models, <em>Biometrics</em> <strong>51</strong>, 1429–1439.</p>
-<p>ROUSSEEUW, P. J. (1984). Least Median of Squares Regression, <em>Journal of the American Statistical Association</em> <strong>79</strong>, 871–880.</p>
-<p>ROUSSEEUW, P. J. <span class="smallcaps">and</span> K. VAN DRIESSEN (2006). Computing LTS Regression for Large Data Sets, <em>Data Mining and Knowledge Discovery</em> <strong>12</strong>, 29–45.</p>
+<p>RICHARDSON, A. M. <span class="smallcaps">and</span> A. H. WELSH (1995). Robust Restricted Maximum Likelihood in Mixed Linear Models, <em>Biometrics</em> <strong>51</strong>, 1429–1439. <a href="https://doi.org/10.2307/2533273">DOI: 10.2307/2533273</a></p>
+<p>ROUSSEEUW, P. J. (1984). Least Median of Squares Regression, <em>Journal of the American Statistical Association</em> <strong>79</strong>, 871–880. <a href="https://doi.org/10.2307/2288718">DOI: 10.2307/2288718</a></p>
+<p>ROUSSEEUW, P. J. <span class="smallcaps">and</span> K. VAN DRIESSEN (2006). Computing LTS Regression for Large Data Sets, <em>Data Mining and Knowledge Discovery</em> <strong>12</strong>, 29–45. <a href="https://doi.org/10.1007/s10618-005-0024-4">DOI: 10.1007/s10618-005-0024-4</a></p>
 <p>ROUSSEEUW, P. J. <span class="smallcaps">and</span> V. YOHAI (1984). Robust Regression by Means of S Estimators, in <em>Robust and Nonlinear Time Series Analysis</em>, ed. by FRANKE, J., W. HÄRDLE AND R. D. MARTIN, New York: Springer, 256–274.</p>
-<p>SALIBIAN-BARRERA, M. <span class="smallcaps">and</span> V. J. YOHAI (2006). A Fast Algorithm for S-Regression Estimates, <em>Journal of Computational and Graphical Statistics</em> <strong>15</strong>, 414–427.</p>
-<p>SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. <em>Austrian Journal of Statistics</em> <strong>41</strong>, 243–265.</p>
-<p>SINHA, S.K. <span class="smallcaps">and</span> J.N.K. RAO (2009). Robust small area estimation. <em>Canadian Journal of Statistics</em> <strong>37</strong>, 381–399.</p>
+<p>SALIBIAN-BARRERA, M. <span class="smallcaps">and</span> V. J. YOHAI (2006). A Fast Algorithm for S-Regression Estimates, <em>Journal of Computational and Graphical Statistics</em> <strong>15</strong>, 414–427. <a href="https://doi.org/10.1198/106186006x113629">DOI: 10.1198/106186006x113629</a></p>
+<p>SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. <em>Austrian Journal of Statistics</em> <strong>41</strong>, 243–265. <a href="http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf">URL: www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf</a></p>
+<p>SINHA, S.K. <span class="smallcaps">and</span> J.N.K. RAO (2009). Robust small area estimation. <em>Canadian Journal of Statistics</em> <strong>37</strong>, 381–399. <a href="https://doi.org/10.1002/cjs.10029">DOI: 10.1002/cjs.10029</a></p>
 </div>
 <div id="appendix" class="section level2">
 <h2>Appendix</h2>
@@ -858,26 +864,27 @@ If <code>areameans = NULL</code>, the prediction is based on the same data that 
 <span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>Number of Observations<span class="sc">:</span>  <span class="dv">36</span> </span>
 <span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>Number of Areas<span class="sc">:</span>  <span class="dv">12</span> </span></code></pre></div>
 <p>To learn more, we call <code>convergence(est)</code> and get</p>
-<pre><code>CONVERGENCE REPORT
-NOTE: ALGORITHM DID NOT CONVERGE!
----
-User specified number of iterations (niter) and
-numeric precision (acc):
-
-                niter   acc
-overall loop        3 1e-05
-fixeff            200 1e-05
-residual var      200 1e-05
-area raneff var   100 1e-05
----
-Number of EE-specific iterations in each call
-(given the user-defined specs), reported for
-each of the3overall iterations:
-
-  fixeff residual var area raneff var
-1      2            2              18
-2      2            2              11
-3      2            2              12</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">convergence</span>(est)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>CONVERGENCE REPORT</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>NOTE<span class="sc">:</span> ALGORITHM DID NOT CONVERGE<span class="sc">!</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="sc">---</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>User specified number of <span class="fu">iterations</span> (niter) and</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>numeric <span class="fu">precision</span> (acc)<span class="sc">:</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                niter   acc</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>overall loop        <span class="dv">3</span> <span class="fl">1e-05</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>fixeff            <span class="dv">200</span> <span class="fl">1e-05</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>residual var      <span class="dv">200</span> <span class="fl">1e-05</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>area raneff var   <span class="dv">100</span> <span class="fl">1e-05</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="sc">---</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>Number of EE<span class="sc">-</span>specific iterations <span class="cf">in</span> each call</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>(given the user<span class="sc">-</span>defined specs), reported <span class="cf">for</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>each of the3overall iterations<span class="sc">:</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  fixeff residual var area raneff var</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>      <span class="dv">2</span>            <span class="dv">2</span>              <span class="dv">18</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>      <span class="dv">2</span>            <span class="dv">2</span>              <span class="dv">11</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>      <span class="dv">2</span>            <span class="dv">2</span>              <span class="dv">12</span></span></code></pre></div>
 <p>Clearly, we have deliberately set the number of (overall or outer loop) iterations equal to <code>niter = 3</code> to illustrate the behavior; see also “niter = 3” on the line “overall loop” in the above table. As a consequence, the algorithm failed to converge.</p>
 <p>The maximum number of iterations for the fixed effects (“fixeff”) is 200, for the residual variance estimator (“residual var”) is 200, for the area-level random effect variance is (“area raneff var”) is 100. The default values can be modified; see documentation of <code>fitsaemodel.control()</code>.</p>
 <p>The last table in the above output shows the number of iterations that the algorithm required for the <code>niter = 3</code> overall loop iteration (i.e., in the first loop, we have <code>fixef = 2</code>, <code>residual var = 2</code> and <code>area raneff var = 18</code> iterations). From this table we can learn how to adjust the default values in case the algorithm does not converge.</p>
