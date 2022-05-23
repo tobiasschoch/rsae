@@ -1,4 +1,4 @@
-# CHANGES in rsae VERSION 0.1-6 (2022-05-22)
+# CHANGES in rsae VERSION 0.2 (2022-05-23)
 
 ## BUG FIXES
 
@@ -28,7 +28,7 @@
 
 * updated CITATION file
 * cleaned documentation and vignette
-* combined several R source files into one source file
+* combined several R source files into one source file and added `init.c`
 * source repository moved from R-Forge to GitHub
 
 # CHANGES in rsae VERSION 0.1-5 (2014-02-13)

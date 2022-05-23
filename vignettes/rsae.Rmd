@@ -359,7 +359,7 @@ FELLNER, W. H. (1986). Robust estimation of variance components, *Technometrics*
 
 HERITIER, S., E. CANTONI, S. COPT, <span style="font-variant:small-caps;">and</span> M.-P. VICTORIA-FESER (2009). *Robust Methods in Biostatistics*, New York: John Wiley & Sons.
 
-MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO <span style="font-variant:small-caps;">and</span> M. A. DI PALMA (2021). *robustbase: Basic Robust Statistics*. R package version 0.93-9. [URL: CRAN.R-project.org/package=robustbase](http://CRAN.R-project.org/package=robustbase).
+MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO <span style="font-variant:small-caps;">and</span> M. A. DI PALMA (2021). *robustbase: Basic Robust Statistics*. R package version 0.93-9. [URL: CRAN.R-project.org/package=robustbase](https://CRAN.R-project.org/package=robustbase).
 
 RAO, J.N.K. (2003). *Small Area Estimation*, New York: John Wiley and Sons.
 

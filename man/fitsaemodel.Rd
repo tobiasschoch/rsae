@@ -108,7 +108,7 @@ Brent, R.P. (1973). \emph{Algorithms for minimization without derivatives}.
 Maechler, M., Rousseeuw, P., Croux, C., Todorov, V., Ruckstuhl, A.,
     Salibian-Barrera, M., Verbeke, T., Koller, M., Conceicao, E.L.T. and
     M. Anna di Palma (2022). robustbase: Basic Robust Statistics R package
-    version 0.95-0. \url{http://CRAN.R-project.org/package=robustbase}
+    version 0.95-0. \url{https://CRAN.R-project.org/package=robustbase}
 
 Maronna, R.A., Martin, D., V.J. Yohai and M. Salibian-Barrera (2019):
     \emph{Robust statistics: Theory and methods}. Chichester: John Wiley
