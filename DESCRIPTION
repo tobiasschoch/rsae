@@ -7,10 +7,11 @@ Authors@R: c(
         email = "tobias.schoch@fhnw.ch",
         comment = c(ORCID = "0000-0002-1640-3395")),
     person("Brent", "Richard", role = c("cph"), comment = "F77 code zeroin.f"))
-Description: The package implements maximum likelihood and outlier-robust
-    M-estimators for parameter estimation under the basic unit-level model.
-    Robust prediction methods of the area-level mean are available, incl. mean
-    square prediction error estimates based on parametric bootstrap.
+Description: Empirical best linear unbiased prediction (EBLUP) and
+    robust prediction of the area-level means under the basic unit-level
+    model. The model can be fitted by maximum likelihood or a (robust)
+    M-estimator. Mean square prediction error is computed by a parametric
+    bootstrap.
 License: GPL (>= 2) | FreeBSD
 NeedsCompilation: yes
 URL: https://github.com/tobiasschoch/rsae
