@@ -31,8 +31,8 @@ makedata(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20, areaID = NULL,
     \item{ve}{\code{[numeric]} nonnegative value of model/ residual variance.}
     \item{ve.contam}{\code{[numeric]} nonnegative value of model variance of
         the outlier part in a mixture distribution (Tukey-Huber-type
-        contamination model) \eqn{e = (1-h)N(0, ve) + hN(0, ve.contam)}
-        {e = (1-h)*N(0, ve) + h*N(0, ve.contam)}.}
+        contamination model) \eqn{e = (1-h)N(0, ve) + hN(0, ve.contam)
+            }{e = (1-h)*N(0, ve) + h*N(0, ve.contam)}.}
     \item{ve.epsilon}{\code{[numeric]} value in \eqn{[0,1]}{[0,1]} that
         defines the relative number of outliers (i.e., epsilon or h in
         the contamination mixture distribution). Typically, it takes
