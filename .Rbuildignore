@@ -5,6 +5,8 @@
 ^\.gitignore$
 ^README\.md$
 ^inst/TODO\.md$
+# src folder
+^src/my_makefile$
 # varia
 ^inst/varia$
 # license (used for GitHub)

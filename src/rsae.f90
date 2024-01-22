@@ -79,28 +79,28 @@ END SUBROUTINE
 !  dgemv (BLAS2 and LAPACK), dgels (LAPACK)
 !  dhuberwgt, dsqrtinvva
 !ON ENTRY:
-!  INTEGER n(1), p(1), k(1), nsize(g), info(1), dec(1), decorr(1)
+!  INTEGER n(1), p(1), k(1), nsize(g), info(1), dec(1), decorr(1),
+!      lwork_dgels(1)
 !  REAL k(1), xmat(n,p) yvec(n), d(1), v(1)
-!      beta(p)
+!      beta(p), work_dgels(:)
 !ON RETURN:
 !  INTEGER info(1)
 !  REAL beta(p), sumwgt(1)
 !--------------------------------------------------------------------
-SUBROUTINE drsaebeta(n, p, g, k, xmat, yvec, v, d, nsize, beta,&
-      sumwgt, info, dec, decorr)
+SUBROUTINE drsaebeta(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, d, &
+      nsize, beta, sumwgt, info, dec, decorr)
    IMPLICIT NONE
-   INTEGER, INTENT(IN) :: n, p, g, dec, decorr
+   INTEGER, INTENT(IN) :: n, p, g, dec, decorr, lwork_dgels
    INTEGER, INTENT(IN) :: nsize(g)
    INTEGER, INTENT(OUT) :: info
    DOUBLE PRECISION, INTENT(IN) :: xmat(n, p)
    DOUBLE PRECISION, INTENT(IN) :: yvec(n)
    DOUBLE PRECISION, INTENT(IN) :: d, v, k
    DOUBLE PRECISION, INTENT(INOUT) :: beta(p)
+   DOUBLE PRECISION, INTENT(INOUT) :: work_dgels(lwork_dgels)
    DOUBLE PRECISION, INTENT(OUT) :: sumwgt
-   !local declarations (most are used in dqrls)
-   INTEGER :: i, j, lwork
-   INTEGER, PARAMETER :: lworkmax = 10000
-   DOUBLE PRECISION :: work(lworkmax)
+   !local declarations
+   INTEGER :: i, j
    DOUBLE PRECISION :: modyvec(n), res(n)
    DOUBLE PRECISION :: modxmat(n, p)
    res = yvec
@@ -119,10 +119,8 @@ SUBROUTINE drsaebeta(n, p, g, k, xmat, yvec, v, d, nsize, beta,&
          sumwgt = sumwgt + res(i)**2
        END DO
    END DO
-   lwork = -1
-   CALL dgels("n", n, p, 1, modxmat, n, modyvec, n, work, lwork, info)
-   lwork = MIN(lworkmax, INT(work(1)))
-   CALL dgels("n", n, p, 1, modxmat, n, modyvec, n, work, lwork, info)
+   CALL dgels("n", n, p, 1, modxmat, n, modyvec, n, work_dgels, lwork_dgels, &
+      info)
    IF (info == 0) THEN
       beta = modyvec(1:p)
    ELSE
@@ -341,17 +339,18 @@ END SUBROUTINE
 !  drsaebeta
 !  ddelta
 !ON ENTRY:
-!  INTEGER n(1), p(1), k(1), nsize(g), iter(1), dec(1), decorr(1)
+!  INTEGER n(1), p(1), k(1), nsize(g), iter(1), dec(1), decorr(1),
+!      lwork_dgels(1)
 !  REAL k(1), xmat(n,p) yvec(n), v(1), d(1), acc(1)
-!      beta(p)
+!      beta(p), work_dgels(:)
 !ON RETURN:
 !  INTEGER converged(1), info(1)
 !  REAL beta(p), sumwgt(1)
 !--------------------------------------------------------------------
-SUBROUTINE drsaebetaiter(n, p, g, k, xmat, yvec, v, d, nsize, acc, &
-      beta, iter, converged, sumwgt, info, dec, decorr)
+SUBROUTINE drsaebetaiter(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, &
+      d, nsize, acc, beta, iter, converged, sumwgt, info, dec, decorr)
    IMPLICIT NONE
-   INTEGER, INTENT(IN) :: n, p, g, dec, decorr
+   INTEGER, INTENT(IN) :: n, p, g, dec, decorr, lwork_dgels
    INTEGER, INTENT(IN) :: nsize(g)
    INTEGER, INTENT(IN) :: iter
    INTEGER, INTENT(OUT) :: converged
@@ -359,7 +358,7 @@ SUBROUTINE drsaebetaiter(n, p, g, k, xmat, yvec, v, d, nsize, acc, &
    DOUBLE PRECISION, INTENT(IN) :: acc, v, d, k
    DOUBLE PRECISION, INTENT(IN) :: yvec(n)
    DOUBLE PRECISION, INTENT(IN) :: xmat(n, p)
-   DOUBLE PRECISION, INTENT(INOUT) :: beta(p)
+   DOUBLE PRECISION, INTENT(INOUT) :: beta(p), work_dgels(lwork_dgels)
    DOUBLE PRECISION, INTENT(OUT) :: sumwgt
    INTEGER :: i, coinfo, niter
    DOUBLE PRECISION :: betaold(p)
@@ -367,8 +366,8 @@ SUBROUTINE drsaebetaiter(n, p, g, k, xmat, yvec, v, d, nsize, acc, &
    niter = 0
    DO i = 1, iter
       betaold = beta
-      CALL drsaebeta(n, p, g, k, xmat, yvec, v, d, nsize,&
-         beta, sumwgt, coinfo, dec, decorr)
+      CALL drsaebeta(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, d, &
+         nsize, beta, sumwgt, coinfo, dec, decorr)
       IF (coinfo /= 0) THEN
          beta = 0
          EXIT
@@ -650,10 +649,24 @@ SUBROUTINE drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
    DOUBLE PRECISION, INTENT(INOUT) :: tau(p + 2)
    DOUBLE PRECISION, INTENT(OUT) :: taurecord(niter, p + 2)
    DOUBLE PRECISION, INTENT(OUT) :: sumwgt(3)
-   INTEGER :: i, j, convergedbeta, work, monitord
+   INTEGER :: i, j, info, lwork_dgels, convergedbeta, work, monitord
    DOUBLE PRECISION :: upper
-   DOUBLE PRECISION :: oldtau(p + 2)
+   DOUBLE PRECISION :: oldtau(p + 2), prep_dgels(2)
    DOUBLE PRECISION :: res(n), stdres(n), sumwgtres(n)
+   ! dynamically allocate work_array (used in dgels)
+   DOUBLE PRECISION, ALLOCATABLE :: work_dgels(:)
+   lwork_dgels = -1
+   CALL dgels("n", n, p, 1, xmat, n, yvec, n, prep_dgels, lwork_dgels, info)
+   ! size of the dgels work array
+   lwork_dgels = INT(prep_dgels(1))
+   ! allocate array and check
+   IF (info == 0) THEN
+      ALLOCATE(work_dgels(lwork_dgels))
+   END IF
+   IF (.NOT. ALLOCATED(work_dgels)) THEN
+      RETURN
+   END IF
+   ! initialize iteration
    iterrecord = 0
    allconverged = 0
    monitord = 0
@@ -661,18 +674,22 @@ SUBROUTINE drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
       oldtau(1 : p) = tau(1 : p)
       oldtau(p + 1) = tau(p + 1)
       oldtau(p + 2) = tau(p + 2)
-      CALL drsaebetaiter(n, p, g, k(1), xmat, yvec, tau(p+1), tau(p+2), &
-         nsize, acc(1), tau(1:p), iter(1), convergedbeta, sumwgt(1), &
-         work, dec, decorr)
+      ! compute regression coefficients
+      CALL drsaebetaiter(n, p, g, lwork_dgels, k(1), xmat, yvec, work_dgels, &
+         tau(p + 1), tau(p + 2), nsize, acc(1), tau(1:p), iter(1), &
+         convergedbeta, sumwgt(1), work, dec, decorr)
       iterrecord(i, 1) = work
       IF (convergedbeta /= 1) THEN
          iterrecord(1, i) = (-1) * iterrecord(1, i)
       END IF
+      ! residuals
       res = yvec
       CALL dgemv("N", n, p, -1D0, xmat, n, tau(1:p), 1, 1D0, res, 1)
       stdres = res
+      ! std. residuals
       CALL dsqrtinvva(n, 1, g, nsize, tau(p + 2), tau(p + 1), 1, dec, &
          decorr, stdres)
+      ! variance component v (unit-level errors)
       CALL drsaehubvest(n, iter(2), tau(p + 1), k(2), acc(2), kappa(1), &
          stdres, sumwgt(2), work)
       iterrecord(i, 2) = work
@@ -681,6 +698,7 @@ SUBROUTINE drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
          iterrecord(i, 3) = 0D0
       ELSE
          upper = tau(p + 2) * 1D1
+         ! ratio of variance components
          CALL drsaehubdestiter(n, g, nsize, tau(p + 1), k(3), kappa(2), &
             res, 0D0, upper, acc(3), tau(p + 2), work, dec, decorr)
          iterrecord(i, 3) = work
@@ -690,6 +708,7 @@ SUBROUTINE drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
          END IF
       END IF
       taurecord(i, :) = tau
+      ! check for convergence
       CALL ddelta(p + 1, oldtau, tau, allacc, allconverged)
       IF (allconverged == 1) THEN
          EXIT
@@ -703,6 +722,7 @@ SUBROUTINE drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
    DO j = 1, n
       sumwgt(3) = sumwgt(3) + sumwgtres(j)
    END DO
+   DEALLOCATE(work_dgels)
 END SUBROUTINE
 !
 !====================================================================
