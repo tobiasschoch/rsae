@@ -1,7 +1,20 @@
-library(testthat)
+#library(testthat)
 library(rsae)
-data("landsat")
 
+# functions that are required in the testing suite utility function
+all_equal <- function(target, current, label,
+    tolerance = sqrt(.Machine$double.eps), scale = NULL,
+    check.attributes = FALSE)
+{
+    if (missing(label))
+        stop("Argument 'label' is missing\n")
+    res <- all.equal(target, current, tolerance, scale,
+        check.attributes = check.attributes)
+    if (is.character(res))
+        cat(paste0(label, ": ", res, "\n"))
+}
+
+data("landsat")
 bhfmodel <- saemodel(formula = HACorn ~ PixelsCorn + PixelsSoybeans,
     area = ~CountyName,
     data = subset(landsat, subset = (outlier == FALSE)))
@@ -10,21 +23,22 @@ bhfmodel <- saemodel(formula = HACorn ~ PixelsCorn + PixelsSoybeans,
 # maximum likelihood estimator
 #-------------------------------------------------------------------------------
 m <- fitsaemodel("ml", bhfmodel)
+
 # check coefficients
 ref_coef <- list(fixeff = structure(c(50.96755698661854, 0.32858050698728736,
     -0.13370990402151223), .Dim = c(1L, 3L), .Dimnames = list("fixeff",
     c("(Intercept)", "PixelsCorn", "PixelsSoybeans"))), raneff =
     structure(c(137.31355346825936, 121.06196596142701), .Dim = 1:2,
     .Dimnames = list("raneff", c("ResidualVar", "AreaVar"))))
-expect_equal(ref_coef, coef(m), label = "mle: coef")
+all_equal(ref_coef, coef(m), label = "mle: coef")
 # number of iterations
-expect_equal(1, m$converged, label = "mle: iterations")
+all_equal(1, m$converged, label = "mle: iterations")
 # variance covariance matrix
 ref_vcov <- structure(c(551.07980468822007, 20.130028525670017,
     13.462459120476971, -1.05455383869718, 0.0023024597019996413,
     3417.0328406402318, -1.1116340200125157, 0.0018440509470665526,
     0.0028156596100094009), .Dim = c(3L, 3L))
-expect_equal(ref_vcov, summary(m)$vcovbeta, label = "mle: vcov")
+all_equal(ref_vcov, summary(m)$vcovbeta, label = "mle: vcov")
 # iterations
 ref_optim <- structure(c(52.093820500254687, 51.608102400640945,
     51.218659380257392, 51.059963027757384, 51.000947258768299,
@@ -54,7 +68,7 @@ ref_optim <- structure(c(52.093820500254687, 51.608102400640945,
     0.88168498592774225, 0.88165639395662576, 0.88164615148067682,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0), .Dim = c(40L, 5L))
-expect_equal(ref_optim, attr(m, "optim")$tau, label = "mle: optim")
+all_equal(ref_optim, attr(m, "optim")$tau, label = "mle: optim")
 # prediction
 d <- unique(landsat[-33, c("MeanPixelsCorn", "MeanPixelsSoybeans",
     "CountyName")])
@@ -69,7 +83,7 @@ ref_pred_fix <- structure(c(122.62932610201376, 123.37908865976928,
     "Hamilton", "Worth", "Humboldt", "Franklin", "Pocahontas", "Winnebago",
     "Wright", "Webster", "Hancock", "Kossuth", "Hardin"), NULL))
 m_pred <- robpredict(m, d)
-expect_equal(ref_pred_fix, m_pred$fixeff, label = "mle: prediction: fixeff")
+all_equal(ref_pred_fix, m_pred$fixeff, label = "mle: prediction: fixeff")
 # prediction of random effects
 ref_pred_raneff <- structure(c(-0.34795581561873956, 2.7306539845643276,
     -11.522100342616657, -8.3128316964299618, 13.641437929064862,
@@ -79,7 +93,7 @@ ref_pred_raneff <- structure(c(-0.34795581561873956, 2.7306539845643276,
     c("Cerro Gordo", "Hamilton", "Worth", "Humboldt", "Franklin",
     "Pocahontas", "Winnebago", "Wright", "Webster", "Hancock",
     "Kossuth", "Hardin"), NULL))
-expect_equal(ref_pred_raneff, m_pred$raneff, label = "mle: prediction: raneff")
+all_equal(ref_pred_raneff, m_pred$raneff, label = "mle: prediction: raneff")
 
 #-------------------------------------------------------------------------------
 # Huber M-estimator
@@ -91,15 +105,15 @@ ref_coef <- list(fixeff = structure(c(50.284889482233901, 0.32845339396860779,
     c("(Intercept)", "PixelsCorn", "PixelsSoybeans"))), raneff =
     structure(c(152.8651163493895, 142.89195559015775), .Dim = 1:2,
     .Dimnames = list("raneff", c("ResidualVar", "AreaVar"))))
-expect_equal(ref_coef, coef(m), label = "huberm: coef")
+all_equal(ref_coef, coef(m), label = "huberm: coef")
 # number of iterations
-expect_equal(1, m$converged, label = "huberm: iterations")
+all_equal(1, m$converged, label = "huberm: iterations")
 # variance covariance matrix
 ref_vcov <- structure(c(617.34904107974603, 17.345477221076752,
     11.591770087408126, -1.1803136733091313, 0.0025778940009007264,
     2924.9265846687849, -1.2446871382399762, 0.0020639640773206873,
     0.0031559392715234426), .Dim = c(3L, 3L))
-expect_equal(ref_vcov, summary(m)$vcovbeta, label = "huberm: vcov")
+all_equal(ref_vcov, summary(m)$vcovbeta, label = "huberm: vcov")
 # iterations
 ref_optim <- structure(c(52.093820500254687, 55.259882759244917,
     50.733227002733955, 50.673399540505798, 50.3836345295719,
@@ -127,7 +141,7 @@ ref_optim <- structure(c(52.093820500254687, 55.259882759244917,
     0.93488494813235012, 0.93479575384092883, 0.93476704272567468,
     0.93475842626883543, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), .Dim = c(40L, 5L))
-expect_equal(ref_optim, attr(m, "optim")$tau, label = "huberm: optim")
+all_equal(ref_optim, attr(m, "optim")$tau, label = "huberm: optim")
 # prediction
 d <- unique(landsat[-33, c("MeanPixelsCorn", "MeanPixelsSoybeans",
     "CountyName")])
@@ -142,7 +156,7 @@ ref_pred_fix <- structure(c(120.87549517897703, 121.58673936423716,
     "Hamilton", "Worth", "Humboldt", "Franklin", "Pocahontas", "Winnebago",
     "Wright", "Webster", "Hancock", "Kossuth", "Hardin"), NULL))
 m_pred <- robpredict(m, d)
-expect_equal(ref_pred_fix, m_pred$fixeff, label = "huberm: prediction: fixeff")
+all_equal(ref_pred_fix, m_pred$fixeff, label = "huberm: prediction: fixeff")
 # prediction of random effects
 ref_pred_raneff <- structure(c(0.17828694239225723, 4.7943357066320891,
     -13.97284439057621, -5.1623984071383386, 14.857085562188589,
@@ -151,5 +165,5 @@ ref_pred_raneff <- structure(c(0.17828694239225723, 4.7943357066320891,
     13.08070103738811), .Dim = c(12L, 1L), .Dimnames = list(c("Cerro Gordo",
     "Hamilton", "Worth", "Humboldt", "Franklin", "Pocahontas", "Winnebago",
     "Wright", "Webster", "Hancock", "Kossuth", "Hardin"), NULL))
-expect_equal(ref_pred_raneff, m_pred$raneff,
+all_equal(ref_pred_raneff, m_pred$raneff,
     label = "huberm: prediction: raneff")

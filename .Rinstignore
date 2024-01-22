@@ -5,8 +5,6 @@
 ^\.gitignore$
 ^README\.md$
 ^inst/TODO\.md$
-# tests
-^tests$
 # varia
 ^inst/varia$
 # license (used for GitHub)
