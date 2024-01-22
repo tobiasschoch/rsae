@@ -839,13 +839,26 @@ SUBROUTINE drlm(n, p, xmat, yvec, k, beta, s, info, niter, acc)
    DOUBLE PRECISION, INTENT(IN) :: xmat(n, p)
    DOUBLE PRECISION, INTENT(OUT) :: s
    DOUBLE PRECISION, INTENT(INOUT) :: beta(p)
-   !local declarations (most are used in dqrls)
-   INTEGER :: i, j, l, lwork, converged
-   INTEGER, PARAMETER :: lworkmax = 10000
+   ! local declarations (most are used in dqrls)
+   INTEGER :: i, j, l, lwork_dgels, converged
+   DOUBLE PRECISION :: prep_dgels(2)
    DOUBLE PRECISION :: oldbeta(p)
-   DOUBLE PRECISION :: work(lworkmax)
    DOUBLE PRECISION :: modyvec(n), res(n)
    DOUBLE PRECISION :: modxmat(n, p)
+   ! dynamically allocate work_array (used in dgels)
+   DOUBLE PRECISION, ALLOCATABLE :: work_dgels(:)
+   lwork_dgels = -1
+   CALL dgels("n", n, p, 1, xmat, n, yvec, n, prep_dgels, lwork_dgels, info)
+   ! size of the dgels work array
+   lwork_dgels = INT(prep_dgels(1))
+   ! allocate array and check
+   IF (info == 0) THEN
+      ALLOCATE(work_dgels(lwork_dgels))
+   END IF
+   IF (.NOT. ALLOCATED(work_dgels)) THEN
+      RETURN
+   END IF
+   ! start iteration
    DO l = 1, niter
       oldbeta = beta
       res = yvec
@@ -861,10 +874,8 @@ SUBROUTINE drlm(n, p, xmat, yvec, k, beta, s, info, niter, acc)
             modxmat(i, j) = xmat(i, j) * res(i)
          END DO
       END DO
-      lwork = -1
-      CALL dgels("n", n, p, 1, modxmat, n, modyvec, n, work, lwork, info)
-      lwork = MIN(lworkmax, INT(work(1)))
-      CALL dgels("n", n, p, 1, modxmat, n, modyvec, n, work, lwork, info)
+      CALL dgels("n", n, p, 1, modxmat, n, modyvec, n, work_dgels, &
+         lwork_dgels, info)
       IF (info == 0) THEN
          beta = modyvec(1:p)
       ELSE
@@ -876,4 +887,5 @@ SUBROUTINE drlm(n, p, xmat, yvec, k, beta, s, info, niter, acc)
          EXIT
       END IF
    END DO
+   DEALLOCATE(work_dgels)
 END SUBROUTINE
