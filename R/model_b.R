@@ -229,8 +229,7 @@ summary.fit_model_b <- function (object, ...)
     vcovbeta <- if (object$converged == 1)
         .Fortran("drsaehubvariance", n = as.integer(model$n),
             p = as.integer(model$p), g = as.integer(model$g),
-            nsize = as.integer(model$nsize), kappa = as.double(attr(object,
-            "optim")$kappa), v = as.double(object$theta[1]),
+            nsize = as.integer(model$nsize), v = as.double(object$theta[1]),
             d = as.double(object$theta[2] / object$theta[1]),
             xmat = as.matrix(model$X), vcovbeta = as.matrix(matrix(0,
             model$p, model$p)), dec = as.integer(attr(object, "dec")),

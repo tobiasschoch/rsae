@@ -1,6 +1,6 @@
 !####################################################################
 !
-!     Copyright (c) 2011, Tobias Schoch
+!     Copyright (c) 2011-2024, Tobias Schoch
 !     All rights reserved.
 !
 !     Redistribution and use in source and binary forms, with or
@@ -33,17 +33,11 @@
 !SUBJECT:      This file, rsae.f90, contains Fortran 90 code for
 !              robust estimation of the basic unit-level small area
 !              model by means of Huber M-estimation
-!NOTES:        These subroutines are designed to be called from R; see
-!              R Development Core Team (2011) for more details on R.
-!              Do not call any routine by yourself unless you are
-!              certain about the implementation details.
-!COMPILER:     GNU gfortran v 4.5.1
-!TESTS:        code tested on platform x86_64 SUSE Linux v 11.4
 !FORTRAN SPEC: The layout of this file has been chosen to conform
 !              with F77's limitation of 72 char per line
 !              (otherwise gfortran must be called
 !              with flag: -ffree-form; or with file ext. ".f90"
-!AUTHOR:       Tobias Schoch, June 12, 2011
+!AUTHOR:       Tobias Schoch
 !LICENSE:      BSD 2 (i.e., modified, 2-clause Berkeley Software
 !              Distribution License, aka Simplified BSD License, aka
 !              FreeBSD License; see above)
@@ -80,7 +74,7 @@ END SUBROUTINE
 !====================================================================
 !SUBROUTINE:   drsaebeta
 !PART OF:      rsaehuber
-!DESCRIPTION:  compute the residual vector
+!DESCRIPTION:  compute regression coefficients
 !DEPENDENCY:
 !  dgemv (BLAS2 and LAPACK), dgels (LAPACK)
 !  dhuberwgt, dsqrtinvva
@@ -109,7 +103,6 @@ SUBROUTINE drsaebeta(n, p, g, k, xmat, yvec, v, d, nsize, beta,&
    DOUBLE PRECISION :: work(lworkmax)
    DOUBLE PRECISION :: modyvec(n), res(n)
    DOUBLE PRECISION :: modxmat(n, p)
-   !
    res = yvec
    CALL dgemv("N", n, p, -1D0, xmat, n, beta, 1, 1D0, res, 1)
    CALL dsqrtinvva(n, 1, g, nsize, d, v, 0, dec, decorr, res)
@@ -123,7 +116,7 @@ SUBROUTINE drsaebeta(n, p, g, k, xmat, yvec, v, d, nsize, beta,&
       DO i = 1, n
          modxmat(i, j) = modxmat(i, j) * res(i)
          modyvec(i) = modyvec(i) * res(i)
-         sumwgt = sumwgt + res(i) ** 2
+         sumwgt = sumwgt + res(i)**2
        END DO
    END DO
    lwork = -1
@@ -136,7 +129,7 @@ SUBROUTINE drsaebeta(n, p, g, k, xmat, yvec, v, d, nsize, beta,&
       beta = 0
    END IF
 END SUBROUTINE
-
+!
 !====================================================================
 !SUBROUTINE:   drsaehubpredict
 !PART OF:      rsaehub
@@ -241,7 +234,7 @@ SUBROUTINE dsqrtinvva(n, p, g, nsize, d, v, par, dec, decorr, amat)
          !robust decorrelation (i.e., centering by median)
             DO i = 1, g
                fd = (1 / SQRT(1 + d * nsize(i))) - 1
-               CALL dmedmad(nsize(i), amat( l(i) : u(i), 1), 0, med)
+               CALL dmedmad(nsize(i), amat(l(i) : u(i), 1), 0, med)
                DO j = 1, nsize(i)
                   amat(l(i) + j - 1, 1) = (fd * med) + amat(l(i) + j - 1, 1)
                END DO
@@ -263,9 +256,9 @@ SUBROUTINE dsqrtinvva(n, p, g, nsize, d, v, par, dec, decorr, amat)
             sqrtv = SQRT(v)
             DO i = 1, g
                fd = (1 / SQRT(1 + d * nsize(i))) - 1
-               CALL dmedmad(nsize(i), amat( l(i) : u(i), 1), 0, med)
+               CALL dmedmad(nsize(i), amat(l(i) : u(i), 1), 0, med)
                DO j = 1, nsize(i)
-                  amat(l(i) + j - 1, 1) = (( fd / sqrtv ) * med) + &
+                  amat(l(i) + j - 1, 1) = ((fd / sqrtv ) * med) + &
                      amat(l(i) + j - 1, 1)
                END DO
             END DO
@@ -276,7 +269,7 @@ SUBROUTINE dsqrtinvva(n, p, g, nsize, d, v, par, dec, decorr, amat)
                m = fd * (SUM(amat(l(i):u(i), :), 1) / nsize(i))
                DO k = 1, p
                   DO j = 1, nsize(i)
-                     amat(l(i) + j - 1, k) = (1/sqrtv) * (m(k) &
+                     amat(l(i) + j - 1, k) = (1 / sqrtv) * (m(k) &
                      + amat(l(i) + j - 1, k))
                   END DO
                END DO
@@ -287,14 +280,14 @@ SUBROUTINE dsqrtinvva(n, p, g, nsize, d, v, par, dec, decorr, amat)
       END SELECT
    ELSE
       DO i = 1, g
-         ALLOCATE( winvv( nsize(i), nsize(i) ) )
-         winvv =  (- d) / ( 1D0 + ( d * nsize(i) ) )
+         ALLOCATE(winvv(nsize(i), nsize(i)))
+         winvv =  (-d) / (1D0 + (d * nsize(i)))
          DO j = 1, nsize(i)
             winvv(j, j) = winvv(j, j) + 1
          END DO
          CALL dpotrf("U", nsize(i), winvv, nsize(i), info)
          CALL dtrmm("L", "U", "N", "N", nsize(i), p, 1D0, winvv, &
-            nsize(i), amat( l(i) : u(i), :), nsize(i))
+            nsize(i), amat(l(i) : u(i), :), nsize(i))
          DEALLOCATE(winvv)
       END DO
       IF (par == 0) THEN
@@ -340,7 +333,6 @@ SUBROUTINE ddelta(p, oldvec, newvec, acc, res)
    END IF
 END SUBROUTINE
 !
-
 !====================================================================
 !SUBROUTINE:   drsaebetaiter
 !PART OF:      rsaehuber
@@ -401,12 +393,11 @@ END SUBROUTINE
 !ON RETURN
 !  REAL
 !--------------------------------------------------------------------
-SUBROUTINE drsaehubvariance(n, p, g, nsize, kappa, v, d, xmat, &
-      vcovbeta, dec)
+SUBROUTINE drsaehubvariance(n, p, g, nsize, v, d, xmat, vcovbeta, dec)
    IMPLICIT NONE
    INTEGER, INTENT(IN) :: n, p, g, dec
    INTEGER, INTENT(IN) :: nsize(g)
-   DOUBLE PRECISION, INTENT(IN) :: kappa, d, v
+   DOUBLE PRECISION, INTENT(IN) :: d, v
    DOUBLE PRECISION, INTENT(IN) :: xmat(n, p)
    DOUBLE PRECISION, INTENT(OUT) :: vcovbeta(p, p)
    !local declarations
@@ -426,10 +417,10 @@ SUBROUTINE drsaehubvariance(n, p, g, nsize, kappa, v, d, xmat, &
       IF (info == 0) THEN
          vcovbeta = fmxtmx
       ELSE
-         vcovbeta = info*1D0
+         vcovbeta = info * 1D0
       END IF
    ELSE
-      vcovbeta = info*1D0
+      vcovbeta = info * 1D0
    END IF
 END SUBROUTINE
 !
@@ -505,7 +496,7 @@ SUBROUTINE drsaehubdest(n, g, nsize, d, v, k, kappa, res, eval, dec, &
       DO j = 1, nsize(i)
          work = work + vec(l(i) + j - 1) * SQRT(1 / (1 + d * nsize(i)))
       END DO
-      rhs = rhs + (work ** 2) / kappa
+      rhs = rhs + (work**2) / kappa
    END DO
    eval = lhs - rhs
 END SUBROUTINE
@@ -550,11 +541,11 @@ SUBROUTINE drsaehubvest(n, niter, v, k, acc, kappa, stdres, &
       workresid = stdres / SQRT(vold)
       CALL dhuberwgt(n, k, 2, workresid)
       DO i = 1, n
-         ssq = ssq + workresid(i) * stdres(i) ** 2
+         ssq = ssq + workresid(i) * stdres(i)**2
          sumwgt = sumwgt + workresid(i)
       END DO
       v = ssq / (n * kappa)
-      IF (ABS(v/vold - 1D0) < acc) THEN
+      IF (ABS(v / vold - 1D0) < acc) THEN
          EXIT
       ELSE
          vold = v
@@ -609,7 +600,7 @@ SUBROUTINE dhuberwgt(n, k, typ, vec)
       CASE(2) !the weights to the power of two
          DO i = 1, n
             IF (choice(i) < 1D0) THEN
-               vec(i) = choice(i) ** 2
+               vec(i) = choice(i)**2
             ELSE
                vec(i) = 1
             END IF
@@ -680,31 +671,32 @@ SUBROUTINE drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
       res = yvec
       CALL dgemv("N", n, p, -1D0, xmat, n, tau(1:p), 1, 1D0, res, 1)
       stdres = res
-      CALL dsqrtinvva(n, 1, g, nsize, tau(p+2), tau(p+1), 1, dec, &
+      CALL dsqrtinvva(n, 1, g, nsize, tau(p + 2), tau(p + 1), 1, dec, &
          decorr, stdres)
-      CALL drsaehubvest(n, iter(2), tau(p+1), k(2), acc(2), kappa(1), &
+      CALL drsaehubvest(n, iter(2), tau(p + 1), k(2), acc(2), kappa(1), &
          stdres, sumwgt(2), work)
       iterrecord(i, 2) = work
       IF (monitord == 1) THEN
-         tau(p+2) = 0D0
+         tau(p + 2) = 0D0
          iterrecord(i, 3) = 0D0
       ELSE
-         upper = tau(p+2) * 1D1
-         CALL drsaehubdestiter(n, g, nsize, tau(p+1), k(3), kappa(2), &
-            res, 0D0, upper, acc(3), tau(p+2), work, dec, decorr)
+         upper = tau(p + 2) * 1D1
+         CALL drsaehubdestiter(n, g, nsize, tau(p + 1), k(3), kappa(2), &
+            res, 0D0, upper, acc(3), tau(p + 2), work, dec, decorr)
          iterrecord(i, 3) = work
-         IF (SUM(taurecord(MAX(i-2, 1):i, p+2)) < 3*epsd .AND. i >= 3) THEN
+         IF (SUM(taurecord(MAX(i - 2, 1):i, p + 2)) < 3 * epsd .AND. i >= 3) &
+            THEN
             monitord = 1
          END IF
       END IF
       taurecord(i, :) = tau
-      CALL ddelta(p+1, oldtau, tau, allacc, allconverged)
+      CALL ddelta(p + 1, oldtau, tau, allacc, allconverged)
       IF (allconverged == 1) THEN
          EXIT
       END IF
    END DO
    sumwgtres = res
-   CALL dsqrtinvva(n, 1, g, nsize, tau(p+2), tau(p+1), 0, dec, &
+   CALL dsqrtinvva(n, 1, g, nsize, tau(p + 2), tau(p + 1), 0, dec, &
       decorr, sumwgtres)
    CALL dhuberwgt(n, k(3), 0, sumwgtres)
    sumwgt(3) = 0D0
@@ -734,7 +726,7 @@ SUBROUTINE drsaeresid(n, p, g, nsize, k, tau, u, xmat, yvec, res, &
    INTEGER, INTENT(IN) :: n, p, g, dec
    INTEGER, INTENT(IN) :: nsize(g)
    DOUBLE PRECISION, INTENT(IN) :: k !robustness tuning constant
-   DOUBLE PRECISION, INTENT(IN) :: tau(p+2) ! (beta, v, d)
+   DOUBLE PRECISION, INTENT(IN) :: tau(p + 2) ! (beta, v, d)
    DOUBLE PRECISION, INTENT(IN) :: u(g) !vector of random effects
    DOUBLE PRECISION, INTENT(IN) :: yvec(n)
    DOUBLE PRECISION, INTENT(IN) :: xmat(n, p)
@@ -755,7 +747,7 @@ SUBROUTINE drsaeresid(n, p, g, nsize, k, tau, u, xmat, yvec, res, &
       END DO
    END DO
    stdres = res
-   CALL dsqrtinvva(n, 1, g, nsize, tau(p+2), tau(p+1), 0, dec, 0, stdres)
+   CALL dsqrtinvva(n, 1, g, nsize, tau(p + 2), tau(p + 1), 0, dec, 0, stdres)
    wgt = stdres
    CALL dhuberwgt(n, k, 0, wgt)
 END SUBROUTINE
@@ -786,9 +778,9 @@ SUBROUTINE dmedmad(n, vx, typ, res)
    work = vx
    CALL qsort3(work, 1, n)
    IF (MODULO(n, 2) == 0) THEN
-      res = ( work(n / 2) + work((n / 2) + 1) ) / 2D0
+      res = (work(n / 2) + work((n / 2) + 1)) / 2D0
    ELSE
-      res = work( ( (n - 1) / 2) + 1)
+      res = work(((n - 1) / 2) + 1)
    END IF
    IF (typ == 1) THEN
       DO i = 1, n
@@ -796,9 +788,9 @@ SUBROUTINE dmedmad(n, vx, typ, res)
       END DO
       CALL qsort3(work, 1, n)
       IF (MODULO(n, 2) == 0) THEN
-         res = ( 1.4814 / 2D0 ) * ( work(n / 2) + work((n / 2) + 1) )
+         res = (1.4814 / 2D0) * (work(n / 2) + work((n / 2) + 1))
       ELSE
-         res = 1.4814 * work( ( (n - 1) / 2) + 1)
+         res = 1.4814 * work(((n - 1) / 2) + 1)
       END IF
    END IF
 END SUBROUTINE

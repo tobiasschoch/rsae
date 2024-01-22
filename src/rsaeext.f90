@@ -66,8 +66,7 @@ SUBROUTINE drsaehubdestiter(n, g, nsize, v, k, kappa, res, lower, upper, &
    !start with checking whether there is a sign change, if not break
    a = lower
    b = upper
-   !note that these function calls have been added to Richard's
-   !original code
+   !note that these function calls have been added to Richard's original code
    !compute fa (i.e., evaluation for a = lower)
    CALL drsaehubdest(n, g, nsize, a, v, k, kappa, res, fa, dec, decorr)
    !compute fb (i.e., evaluation for b = upper)
