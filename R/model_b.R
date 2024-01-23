@@ -40,7 +40,7 @@
     # compute estimates
     taurecord <- matrix(0, control$niter, (model$p + 2))
     eps <- .Machine$double.eps
-    tmp <- .Fortran("drsaehub", n = as.integer(model$n),
+    tmp <- .Fortran(F_drsaehub, n = as.integer(model$n),
         p = as.integer(model$p), g = as.integer(model$g),
         niter = as.integer(control$niter), nsize = as.integer(model$nsize),
         iter = as.integer(control$iter), iterrecord = as.matrix(matrix(0,
@@ -50,8 +50,7 @@
         k = as.matrix(k), kappa = as.matrix(kappa),
         epsd = as.double(eps^(1 / 4)), tau = as.matrix(init),
         taurecord = as.matrix(taurecord), converged = as.integer(0),
-        dec = as.integer(control$dec), decorr = as.integer(control$decorr),
-        PACKAGE = "rsae")
+        dec = as.integer(control$dec), decorr = as.integer(control$decorr))
     # check for cycling an choose the parameter-vector estimate whose
     # estimate of v is closer to the (robust) init (i.e., either the "lts" or
     # "s" estimate) value. This method is not supported for init=default or ml
@@ -118,12 +117,12 @@
         # some magic numbers
         k <- 1.345; acc <- 0.00001; niter <- 20
         # compute the robust fixed-effects estimator
-        tmp <- .Fortran("drlm", n = as.integer(model$n),
+        tmp <- .Fortran(F_drlm, n = as.integer(model$n),
             p = as.integer(p + g), xmat = as.matrix(cbind(X_centered, mm)),
             yvec = as.matrix(y_centered), k = as.double(k),
             beta = as.matrix(rep(1, (p + g))), s = as.double(1.2),
             info = as.integer(1), niter = as.integer(niter),
-            acc = as.double(acc), PACKAGE = "rsae")
+            acc = as.double(acc))
         res <- c(0, tmp$beta[1:p], tmp$s^2, 100)
     }
     #-------------
@@ -227,13 +226,12 @@ summary.fit_model_b <- function (object, ...)
     # covariance matrix
     model <- attr(object, "saemodel")
     vcovbeta <- if (object$converged == 1)
-        .Fortran("drsaehubvariance", n = as.integer(model$n),
+        .Fortran(F_drsaehubvariance, n = as.integer(model$n),
             p = as.integer(model$p), g = as.integer(model$g),
             nsize = as.integer(model$nsize), v = as.double(object$theta[1]),
             d = as.double(object$theta[2] / object$theta[1]),
             xmat = as.matrix(model$X), vcovbeta = as.matrix(matrix(0,
-            model$p, model$p)), dec = as.integer(attr(object, "dec")),
-            PACKAGE = "rsae")$vcovbeta
+            model$p, model$p)), dec = as.integer(attr(object, "dec")))$vcovbeta
     else
         matrix(NA_real_, model$p, model$p)
 

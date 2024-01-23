@@ -1,3 +1,7 @@
+# load shared objects; registration is via src/init.c file; the names of the
+# registered symbols have prefix "F_" such that they are easily recognizable
+useDynLib(rsae, .registration = TRUE, .fixes = "F_")
+
 # import
 importFrom("graphics",
     par, lines, axis, grid, box, legend, arrows)
@@ -31,6 +35,3 @@ S3method(residuals, pred_model_b)
 # varia
 export(convergence)
 export(makedata)
-
-#register the dll
-useDynLib(rsae, .registration = TRUE)

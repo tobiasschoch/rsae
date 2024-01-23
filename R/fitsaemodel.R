@@ -6,6 +6,7 @@ fitsaemodel <- function(method, model, ...)
              call. = FALSE)
 
     method <- match.arg(method, c("ml", "huberm", "tukeys"))
+
     res <- if (method == "tukeys")
         stop("Tukey S-estimator not implemented yet!\n")
     else
