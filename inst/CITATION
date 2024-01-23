@@ -6,4 +6,4 @@ bibentry(bibtype = "Article",
     number = "4",
     pages = "243--265",
     year = "2012",
-    url = "http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf")
+    doi = "https://doi.org/10.17713/ajs.v41i4.1548")

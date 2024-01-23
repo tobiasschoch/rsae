@@ -94,7 +94,7 @@ makedata(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20, areaID = NULL,
 \references{
 Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm
     for Large Datasets. \emph{Austrian Journal of Statistics} \bold{41},
-    243--265. \url{http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf}
+    243--265. \doi{https://doi.org/10.17713/ajs.v41i4.1548}
 
 Stahel, W. A. and A. Welsh (1997).
     Approaches to robust estimation in the simplest variance components model.

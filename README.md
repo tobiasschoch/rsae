@@ -5,7 +5,7 @@
 
 ## Summary
 
-The `rsae` package is an `R` ([R Core Team, 2022](#references)) package that provides functions to estimate the parameters of the basic unit-level model in small area estimation (also known as model type "B" in [Rao, 2003](#references),  or nested-error regression model in [Battese et al., 1988](#references)). 
+The `rsae` package is an `R` ([R Core Team, 2024](#references)) package that provides functions to estimate the parameters of the basic unit-level model in small area estimation (also known as model type "B" in [Rao, 2003](#references),  or nested-error regression model in [Battese et al., 1988](#references)). 
 
 In step 1, the model is fitted by one of the methods:
 
@@ -45,12 +45,12 @@ If you have questions about how to use the software, or would like to seek out c
 
 ## References
 
-BATTESE, G. E., R. M. HARTER, AND W. A. FULLER (1988). An error component model for prediction of county crop areas using, *Journal of the American Statistical Association* **83**, 28–36.
+BATTESE, G. E., R. M. HARTER, AND W. A. FULLER (1988). An error component model for prediction of county crop areas using, *Journal of the American Statistical Association* **83**, 28–36. [DOI: 10.2307/2288915](https://doi.org/10.2307/2288915)
 
 COPT, S. AND M.-P. VICTORIA-FESER (2009). *Robust prediction in mixed linear models*, Tech. report, University of Geneva.
 
-R CORE TEAM (2022). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
+R CORE TEAM (2024). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
 
 RAO, J. (2003). *Small Area Estimation*, Hoboken (NJ): John Wiley and Sons.
 
-SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Data, *Austrian Journal of Statistics* **41**, 243–265.
+SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Data, *Austrian Journal of Statistics* **41**, 243–265. [DOI: 10.17713/ajs.v41i4.1548](https://doi.org/10.17713/ajs.v41i4.1548)

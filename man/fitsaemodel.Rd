@@ -126,7 +126,7 @@ Rousseeuw, P. J. and K. Van Driessen (2006).
 
 Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm
     for Large Datasets. \emph{Austrian Journal of Statistics} \bold{41},
-    243--265. \url{http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf}
+    243--265. \doi{https://doi.org/10.17713/ajs.v41i4.1548}
 }
 \seealso{
     \code{\link[=fitsaemodel.control]{fitsaemodel.control()}}

@@ -135,7 +135,7 @@ Heritier, S., Cantoni, E., Copt, S., and M.-P. Victoria-Feser (2009).
 
 Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm
     for Large Datasets. \emph{Austrian Journal of Statistics} \bold{41},
-    243--265. \url{http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf}
+    243--265. \doi{https://doi.org/10.17713/ajs.v41i4.1548}
 
 Sinha, S.K. and J.N.K. Rao (2009).
     Robust small area estimation.

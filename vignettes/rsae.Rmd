@@ -3,6 +3,7 @@ title: "Robust Estimation and Prediction Under the Unit-Level SAE Model"
 author: "Tobias Schoch"
 output:
     html_document:
+        css: "fluent.css"
         highlight: tango
 vignette: >
   %\VignetteIndexEntry{Robust Estimation and Prediction Under the Unit-Level SAE Model}
@@ -14,7 +15,8 @@ vignette: >
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "",
-    prompt = TRUE
+    prompt = TRUE,
+    fig.align = "center"
 )
 library("rsae")
 ```
@@ -66,7 +68,7 @@ This vignette is organized as follows:
 **Citable companion paper of the package**
 </p>
 <p>
-Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* 41(4), pp. 243--265. [URL: www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf](http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf)
+Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* **41**, pp. 243--265. [DOI: 10.17713/ajs.v41i4.1548](https://doi.org/10.17713/ajs.v41i4.1548)
 </p>
 </div>
 
@@ -359,7 +361,7 @@ FELLNER, W. H. (1986). Robust estimation of variance components, *Technometrics*
 
 HERITIER, S., E. CANTONI, S. COPT, <span style="font-variant:small-caps;">and</span> M.-P. VICTORIA-FESER (2009). *Robust Methods in Biostatistics*, New York: John Wiley & Sons.
 
-MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO <span style="font-variant:small-caps;">and</span> M. A. DI PALMA (2021). *robustbase: Basic Robust Statistics*. R package version 0.93-9. [URL: CRAN.R-project.org/package=robustbase](https://CRAN.R-project.org/package=robustbase).
+MAECHLER, M., P. J. ROUSSEEUW, C. CROUX, V. TODOROC, A. RUCKSTUHL, M. SALIBIAN-BARRERA, T. VERBEKE, M. KOLLER, M. KOLLER, E. L. T. CONCEICAO <span style="font-variant:small-caps;">and</span> M. A. DI PALMA (2023). *robustbase: Basic Robust Statistics*. R package version 0.99-1. [URL: CRAN.R-project.org/package=robustbase](https://CRAN.R-project.org/package=robustbase).
 
 RAO, J.N.K. (2003). *Small Area Estimation*, New York: John Wiley and Sons.
 
@@ -373,7 +375,7 @@ ROUSSEEUW, P. J. <span style="font-variant:small-caps;">and</span> V. YOHAI (198
 
 SALIBIAN-BARRERA, M. <span style="font-variant:small-caps;">and</span> V. J. YOHAI (2006). A Fast Algorithm for S-Regression Estimates, *Journal of Computational and Graphical Statistics* **15**, 414--427. [DOI: 10.1198/106186006x113629](https://doi.org/10.1198/106186006x113629)
 
-SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* **41**, 243--265. [URL: www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf](http://www.stat.tugraz.at/AJS/ausg124/124Schoch.pdf)
+SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Datasets. *Austrian Journal of Statistics* **41**, 243--265. [DOI: 10.17713/ajs.v41i4.1548](https://doi.org/10.17713/ajs.v41i4.1548)
 
 SINHA, S.K. <span style="font-variant:small-caps;">and</span> J.N.K. RAO (2009). Robust small area estimation. *Canadian Journal of Statistics* **37**, 381--399. [DOI: 10.1002/cjs.10029](https://doi.org/10.1002/cjs.10029)
 
