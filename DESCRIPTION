@@ -27,6 +27,5 @@ Imports:
 Suggests:
     knitr,
     rmarkdown,
-    robustbase,
-    nlme
+    robustbase
 VignetteBuilder: knitr, rmarkdown

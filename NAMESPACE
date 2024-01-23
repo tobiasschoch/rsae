@@ -1,10 +1,11 @@
 # import
 importFrom("graphics",
-    "par", "lines", "axis", "grid", "box", "legend", "arrows")
+    par, lines, axis, grid, box, legend, arrows)
 importFrom("stats",
-    "model.frame", "model.response", "model.matrix", "pnorm", "dnorm", "rnorm",
-    "pt", "printCoefmat", "median")
-importFrom("utils", "setTxtProgressBar", "txtProgressBar")
+    model.frame, model.response, model.matrix, pnorm, dnorm, rnorm, pt,
+    printCoefmat, median)
+importFrom("utils",
+    setTxtProgressBar, txtProgressBar)
 
 # saemodel
 export(saemodel)

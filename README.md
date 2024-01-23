@@ -51,6 +51,6 @@ COPT, S. AND M.-P. VICTORIA-FESER (2009). *Robust prediction in mixed linear mod
 
 R CORE TEAM (2024). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
 
-RAO, J. (2003). *Small Area Estimation*, Hoboken (NJ): John Wiley and Sons.
+RAO, J. N. K. (2003). *Small Area Estimation*, Hoboken (NJ): John Wiley and Sons.
 
 SCHOCH, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm for Large Data, *Austrian Journal of Statistics* **41**, 243–265. [DOI: 10.17713/ajs.v41i4.1548](https://doi.org/10.17713/ajs.v41i4.1548)

@@ -12,4 +12,4 @@
 # license (used for GitHub)
 ^LICENSE
 # vignettes
-^vignettes/my_Makefile$
+^vignettes/my_makefile$
