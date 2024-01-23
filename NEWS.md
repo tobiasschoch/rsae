@@ -1,8 +1,12 @@
 # CHANGES in rsae VERSION 0.3 (2024-01-23)
 
+## Changes
+
+Starting with version 0.3, the `rsae` package is distributed under the [GPLv3](https://www.r-project.org/Licenses/GPL-3) license (before it has been published under the BSD-3-Clause license).
+
 ## FIXES
 
-* Fixed Fortran compiler warnings
+* Fixed Fortran compiler warnings and 
 * Fixed typos in the help files
 
 # CHANGES in rsae VERSION 0.2 (2022-05-23)

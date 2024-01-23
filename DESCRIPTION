@@ -12,7 +12,7 @@ Description: Empirical best linear unbiased prediction (EBLUP) and
     model. The model can be fitted by maximum likelihood or a (robust)
     M-estimator. Mean square prediction error is computed by a parametric
     bootstrap.
-License: GPL (>= 2) | FreeBSD
+License: GPL-3
 NeedsCompilation: yes
 URL: https://github.com/tobiasschoch/rsae
 BugReports: https://github.com/tobiasschoch/rsae/issues

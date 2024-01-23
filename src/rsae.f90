@@ -1,55 +1,32 @@
 !###############################################################################
 !
-!     Copyright (c) 2011-2024, Tobias Schoch
-!     All rights reserved.
+!   rsae: robust small area estimation
+!   Copyright (C) 2024 Tobias Schoch
 !
-!     Redistribution and use in source and binary forms, with or
-!     without modification, are permitted provided that the following
-!     conditions are met:
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or
+!   (at your option) any later version.
 !
-!     * Redistributions of source code must retain the above copyright
-!       notice, this list of conditions and the following disclaimer.
-!     * Redistributions in binary form must reproduce the above
-!       copyright notice, this list of conditions and the following
-!       disclaimer in the documentation and/or other materials provided
-!       with the distribution.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+!   GNU General Public License for more details.
 !
-!     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-!     CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-!     INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-!     MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-!     DISCLAIMED. IN NO EVENT SHALL Tobias Schoch BE LIABLE FOR
-!     ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-!     OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-!     OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-!     LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-!     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-!     THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-!     SUCH DAMAGE.
+!   You should have received a copy of the GNU General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
-!###############################################################################
 !
-!SUBJECT:      This file, rsae.f90, contains Fortran 90 code for
-!              robust estimation of the basic unit-level small area
-!              model by means of Huber M-estimation
-!FORTRAN SPEC: The layout of this file has been chosen to conform
-!              with F77's limitation of 72 char per line
-!              (otherwise gfortran must be called
-!              with flag: -ffree-form; or with file ext. ".f90"
-!AUTHOR:       Tobias Schoch
-!LICENSE:      BSD 2 (i.e., modified, 2-clause Berkeley Software
-!              Distribution License, aka Simplified BSD License, aka
-!              FreeBSD License; see above)
-!DEPENDENCY:   LAPACK
-!              BLAS
-!              Richard Brents zeroin.f (GPL; see file 'rsaeext.f90')
-!
-!###############################################################################
+!   SUBJECT:        This file, rsae.f90, contains Fortran 90 code for
+!                   robust estimation of the basic unit-level small area
+!                   model by means of Huber M-estimation
+!   AUTHOR:         Tobias Schoch (tobias.schoch@gmail.com)
+!   DEPENDENCiES:   LAPACK
+!                   BLAS
+!                   Richard Brents zeroin.f (GPL; see file 'rsaeext.f90')
 !
 !===============================================================================
 !SUBROUTINE:   dconvumtofull
-!PART OF:      sct
 !DESCRIPTION:  convert a upper triagular matrix to a full matrix
 !ON ENTRY:
 !   INTEGER n(1)
@@ -71,7 +48,6 @@ subroutine dconvumtofull(n, mat)
 end subroutine
 !===============================================================================
 !SUBROUTINE:   drsaebeta
-!PART OF:      rsaehuber
 !DESCRIPTION:  compute regression coefficients
 !DEPENDENCY:
 !   dgemv (BLAS2 and LAPACK), dgels (LAPACK)
@@ -127,7 +103,6 @@ subroutine drsaebeta(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, d, &
 end subroutine
 !===============================================================================
 !SUBROUTINE:   drsaehubpredict
-!PART OF:      rsaehub
 !DESCRIPTION:  robust prediction of random effects
 !DEPENDENCY:   dsqrtinvva, huberpsi, dgemv(BLAS)
 !ON ENTRY:
@@ -176,7 +151,6 @@ subroutine drsaehubpredict(n, p, g, nsize, k, kappa, d, v, beta, yvec, &
 end subroutine
 !===============================================================================
 !SUBROUTINE:   dsqrtinvva
-!PART OF:      rsaehuber
 !STATUS:       June 23, 2011; mod November 3, 2011
 !DESCRIPTION:  pre-multiply a matrix (vector) by the square root of
 !              the inverse covariance matrix with either
@@ -299,7 +273,6 @@ end subroutine
 !
 !===============================================================================
 !FUNCTION:     is_converged
-!PART OF:      sctrob
 !DESCRIPTION:  computes the squared norm for two parameter vectors and
 !              evaluates if their difference is smaller than the
 !              reference acc; return 1 if true, 0 else.
@@ -329,7 +302,6 @@ function is_converged(p, oldvec, newvec, acc)
 end function is_converged
 !===============================================================================
 !SUBROUTINE:   drsaebetaiter
-!PART OF:      rsaehuber
 !DESCRIPTION:  fully iterated drsaebeta; info carries the # of iter
 !DEPENDENCY:
 !   drsaebeta
@@ -379,7 +351,6 @@ subroutine drsaebetaiter(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, &
 end subroutine
 !===============================================================================
 !SUBROUTINE:   drsaehubvariance
-!PART OF:      rsaehub
 !DESCRIPTION:  robust prediction of random effects
 !DEPENDENCY:   dsqrtinvva, dsyrk(BLAS), dtrtri(LAPACK)
 !ON ENTRY:
@@ -420,7 +391,6 @@ subroutine drsaehubvariance(n, p, g, nsize, v, d, xmat, vcovbeta, dec)
 end subroutine
 !===============================================================================
 !SUBROUTINE:   dhuberpsi
-!PART OF:      sctrob
 !DESCRIPTION:  compute huber psi
 !BENCHMARK:    robustbase:::huberPsi@psi (v 0.7-6),
 !              approved June 18, 2011
@@ -448,7 +418,6 @@ subroutine dhuberpsi(n, k, vec)
 end subroutine
 !===============================================================================
 !SUBROUTINE:   drsaehubdest
-!PART OF:      drsaehuber
 !DESCRIPTION:  evaluates the (non-linear) estimating of d; it is called
 !              from the modified zeroin function; kappa is the
 !              consistency correction term
@@ -495,7 +464,6 @@ subroutine drsaehubdest(n, g, nsize, d, v, k, kappa, res, eval, dec, &
 end subroutine
 !===============================================================================
 !SUBROUTINE:   drsaehubvest
-!PART OF.      rsaehuber
 !DESCRIPTION:  compute a Huber type M-scale^2 estimate; note that
 !              stdres = v^(-1/2)*res, with res=y-x*beta and v is
 !              parametrized in Hartley-Rao manner
@@ -547,7 +515,6 @@ subroutine drsaehubvest(n, niter, v, k, acc, kappa, stdres, &
 end subroutine
 !===============================================================================
 !SUBROUTINE:   dhuberwgt
-!PART OF:      sctrob
 !DESCRIPTION:  compute huber psi-weight; NOTE:
 !              typ = 1 for sqrt(wgt)
 !              typ = 0 for wgt,
@@ -718,7 +685,6 @@ subroutine drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
 end subroutine
 !===============================================================================
 !SUBROUTINE:   drsaeresid
-!PART OF:      rsaehuber
 !DESCRIPTION:  get the residuals and the huber wgt; i.e., res = e_ij
 !              = y_ij - X_ij * beta - u_i; and stdres=V^(-1/2)*res;
 !              the huber weight is w.r.t. to the model-psi (not the
@@ -764,7 +730,6 @@ end subroutine
 !===============================================================================
 !SUBROUTINE:   dmedmed
 !AUTHOR:       Tobias Schoch, November 19, 2011
-!PART OF:      sctrob
 !DESCRIPTION:  computes the median (type=2 in R; i.e., average over
 !              discontinuities) and compute the mad
 !              typ = 0; median
@@ -806,7 +771,6 @@ subroutine dmedmad(n, vx, typ, res)
 end subroutine
 !===============================================================================
 !SUBROUTINE:   drlm
-!PART OF:      sctrob
 !AUTHOR:       Tobias Schoch, November 20, 2011
 !DESCRIPTION:  compute regression M-estimates, using the mad as the
 !              preliminary scale estimate
