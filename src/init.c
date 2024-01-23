@@ -1,5 +1,5 @@
+// RegisteringDynamic Symbols
 #include <R_ext/RS.h>
-#include <stdlib.h>
 #include <R_ext/Rdynload.h>
 
 extern void F77_NAME(drlm)(void *, void *, void *, void *, void *, void *,
@@ -15,6 +15,7 @@ extern void F77_NAME(drsaehubvariance)(void *, void *, void *, void *, void *,
 extern void F77_NAME(drsaeresid)(void *, void *, void *, void *, void *,
     void *, void *, void *, void *, void *, void *, void *, void *);
 
+// create array describing each Fortran routine
 static const R_FortranMethodDef FortranEntries[] = {
     {"drlm",             (DL_FUNC) &F77_NAME(drlm),             10},
     {"drsaehub",         (DL_FUNC) &F77_NAME(drsaehub),         20},
@@ -24,8 +25,10 @@ static const R_FortranMethodDef FortranEntries[] = {
     {NULL, NULL, 0}
 };
 
+// register the routines to R
 void R_init_rsae(DllInfo *dll)
 {
     R_registerRoutines(dll, NULL, NULL, FortranEntries, NULL);
     R_useDynamicSymbols(dll, FALSE);
+    R_forceSymbols(dll, TRUE);
 }
