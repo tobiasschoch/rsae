@@ -37,7 +37,7 @@ If you have any suggestions for feature additions or any problems with the softw
 
 #### How to contribute
 
-If you are interested in modifying the code, you may fork the project for your own use, as detailed in the FreeBSD License we have adopted for the project. In order to contribute, please contact the developer by Tobias Schoch at gmail dot com (the names are separated by a dot) after making the desired changes.
+If you are interested in modifying the code, you may fork the project for your own use, as detailed in the GPLv3 License we have adopted for the project. In order to contribute, please contact the developer by Tobias Schoch at gmail dot com (the names are separated by a dot) after making the desired changes.
 
 #### Asking for help
 

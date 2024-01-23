@@ -843,3 +843,65 @@ subroutine drlm(n, p, xmat, yvec, k, beta, s, info, niter, acc)
     end do
     deallocate(work_dgels)
 end subroutine
+!===============================================================================
+!SUBROUTINE:   drsaehubdestiter
+!PART OF:      rsae
+!DESCRIPTION:  root-finding device; evaluates drsaehubdest between
+!              lower and upper; there must be a sign change in the
+!              interval, otherwise the sub stops
+!DEPENDENCY:   zero_rc
+!ON ENTRY:
+!   INTEGER n(1), g(1), nsize(g), dec(1)
+!   REAL v(1), k(1), kappa(1), lower(1), upper(1), tol(1), res(n)
+!ON RETURN
+!   INTEGER info(1)
+!   REAL zeroin(1)
+!-------------------------------------------------------------------------------
+subroutine drsaehubdestiter(n, g, nsize, v, k, kappa, res, lower, upper, &
+        tol, zeroin, info, dec, decorr)
+    implicit none
+    !zeroin declarations
+    integer, intent(out) :: info
+    double precision, intent(in) :: lower, upper, tol
+    double precision, intent(out) :: zeroin
+    integer, intent(in) :: n, g, dec, decorr
+    integer, intent(in) :: nsize(g)
+    double precision, intent(in) :: v, k, kappa
+    double precision, intent(in) :: res(n)
+    !local declarations
+    integer, parameter :: ITMAX = 100
+    integer :: iter, state
+    double precision :: f_lower, f_upper, arg, f_value
+
+    !evaluate the function at the interval borders (lower, upper)
+    call drsaehubdest(n, g, nsize, lower, v, k, kappa, res, f_lower, dec, &
+        decorr)
+    call drsaehubdest(n, g, nsize, upper, v, k, kappa, res, f_upper, dec, &
+        decorr)
+    !stop if there is no sign change of the functions values over the interval
+    if ((f_lower > 0d0 .and. f_upper > 0d0) .or. &
+            (f_lower < 0d0 .and. f_upper < 0d0)) then
+        info = -1
+        zeroin = 0d0
+        return
+    end if
+
+    !start with Brent's root finding algorithm
+    info = 0
+    state = 0               !this initializes the search with zero_rc
+    arg = 0d0               !no need to initialize function argument
+    f_value = 1d0           !matters only in the (iter + 1) call
+    do iter = 1, ITMAX
+        !check for zero
+        call zero_rc(lower, upper, tol, arg, state, f_value)
+        !termination criterion
+        if (state == 0) then
+            info = iter
+            exit
+        end if
+        !evaluate function at arg
+        call drsaehubdest(n, g, nsize, arg, v, k, kappa, res, f_value, &
+            dec, decorr)
+    end do
+    zeroin = arg
+end subroutine

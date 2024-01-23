@@ -83,9 +83,10 @@ convergence(object)
     }
     \subsection{Implementation}{
         The methods are computed by (nested) iteratively re-weighted least
-        squares and Brent's \code{zeroin} method (Brent, 1973). The
-        functions depend on the subroutines in BLAS (Blackford et al., 2002)
-        and LAPACK (Anderson et al., 2000); see Schoch (2012).
+        squares and a derivative of Richard Brent's \code{zeroin} algorithm;
+        see Brent (2013, Chapter 4). The functions depend on the subroutines in
+        BLAS (Blackford et al., 2002) and LAPACK (Anderson et al., 2000); see
+        Schoch (2012).
     }
 }
 \value{
@@ -102,8 +103,10 @@ Blackford, L.S., Petitet, A., Pozo, R., Remington, K., Whaley, R.C.,
     \emph{ACM Transactions on Mathematical Software} \bold{28}, 135--151.
     \doi{https://doi.org/10.1145/567806.567807}
 
-Brent, R.P. (1973). \emph{Algorithms for minimization without derivatives}.
-    Englewood Cliffs, NJ: Prentice-Hall.
+Brent, R.P. (2013). \emph{Algorithms for minimization without derivatives}.
+    Mineola (NY): Dover Publications Inc. (This publication is an unabridged
+    republication of the work originally published by Prentice-Hall Inc.,
+    Englewood Cliffs, NJ, in 1973).
 
 Maechler, M., Rousseeuw, P., Croux, C., Todorov, V., Ruckstuhl, A.,
     Salibian-Barrera, M., Verbeke, T., Koller, M., Conceicao, E.L.T. and

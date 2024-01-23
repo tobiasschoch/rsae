@@ -2,11 +2,12 @@
 
 ## Changes
 
-Starting with version 0.3, the `rsae` package is distributed under the [GPLv3](https://www.r-project.org/Licenses/GPL-3) license (before it has been published under the BSD-3-Clause license).
+* Starting with version 0.3, the `rsae` package is distributed under the [GPLv3](https://www.r-project.org/Licenses/GPL-3) license (before it has been published under the BSD-3-Clause license).
+* For root finding, we now use the Fortran 90 routine `zero_rc` of John Burkardt (license: Lesser GPL).
 
 ## FIXES
 
-* Fixed Fortran compiler warnings and 
+* Fixed Fortran compiler warnings
 * Fixed typos in the help files
 
 # CHANGES in rsae VERSION 0.2 (2022-05-23)

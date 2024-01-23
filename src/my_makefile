@@ -6,7 +6,7 @@ DLL_LAPACK = $(R_DIR)/lib/libRlapack.so
 DLL_R      = $(R_DIR)/lib/libR.so
 
 # Link
-OBJ = rsae.o rsaeext.o
+OBJ = rsae.o zero_rc.o
 
 rsae.so : $(OBJ)
 	$(CC) -shared -o $@ -L $(DLL_BLAS) $(DLL_LAPACK) $(DLL_R) $(OBJ)
