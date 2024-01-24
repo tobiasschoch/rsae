@@ -40,7 +40,7 @@
     # compute estimates
     taurecord <- matrix(0, control$niter, (model$p + 2))
     eps <- .Machine$double.eps
-    tmp <- .Fortran(F_drsaehub, n = as.integer(model$n),
+    tmp <- .C(C_drsaehub, n = as.integer(model$n),
         p = as.integer(model$p), g = as.integer(model$g),
         niter = as.integer(control$niter), nsize = as.integer(model$nsize),
         iter = as.integer(control$iter), iterrecord = as.matrix(matrix(0,
@@ -117,7 +117,7 @@
         # some magic numbers
         k <- 1.345; acc <- 0.00001; niter <- 20
         # compute the robust fixed-effects estimator
-        tmp <- .Fortran(F_drlm, n = as.integer(model$n),
+        tmp <- .C(C_drlm, n = as.integer(model$n),
             p = as.integer(p + g), xmat = as.matrix(cbind(X_centered, mm)),
             yvec = as.matrix(y_centered), k = as.double(k),
             beta = as.matrix(rep(1, (p + g))), s = as.double(1.2),
@@ -226,7 +226,7 @@ summary.fit_model_b <- function (object, ...)
     # covariance matrix
     model <- attr(object, "saemodel")
     vcovbeta <- if (object$converged == 1)
-        .Fortran(F_drsaehubvariance, n = as.integer(model$n),
+        .C(C_drsaehubvariance, n = as.integer(model$n),
             p = as.integer(model$p), g = as.integer(model$g),
             nsize = as.integer(model$nsize), v = as.double(object$theta[1]),
             d = as.double(object$theta[2] / object$theta[1]),

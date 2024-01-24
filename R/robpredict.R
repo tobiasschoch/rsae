@@ -25,7 +25,7 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
 
     # preparations for fortran-call
     predre <- predfe <- rep(0, model$g)
-    tmp <- .Fortran(F_drsaehubpredict, n = as.integer(model$n),
+    tmp <- .C(C_drsaehubpredict, n = as.integer(model$n),
         p = as.integer(model$p), g = as.integer(model$g),
         nsize = as.integer(model$nsize), k = as.double(k),
         kappa = as.double(kappa), d = as.double(d), v = as.double(v),
@@ -63,7 +63,7 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     # compute the residuals of the model (i.e. e_ij = y_ij - X_ij*beta - u_i)
     tau <- c(fit$beta, v, d)
     vn <- numeric(model$n)
-    getres <- .Fortran(F_drsaeresid, n = as.integer(model$n),
+    getres <- .C(C_drsaeresid, n = as.integer(model$n),
         p = as.integer(model$p), g = as.integer(model$g),
         nsize = as.integer(model$nsize), k = as.double(k_fit),
         tau = as.matrix(tau), u = as.matrix(raneff), xmat = as.matrix(model$X),
@@ -89,7 +89,7 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     v <- fit$theta[1]                       # variance components
     d <- fit$theta[2] / v
     predre <- predfe <- rep(0, model$g)
-    tmp <- .Fortran(F_drsaehubpredict, n = as.integer(model$n),
+    tmp <- .C(C_drsaehubpredict, n = as.integer(model$n),
         p = as.integer(model$p), g = as.integer(model$g),
         nsize = as.integer(model$nsize), k = as.double(k),
         kappa = as.double(kappa), d = as.double(d), v = as.double(v),

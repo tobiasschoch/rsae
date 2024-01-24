@@ -1,6 +1,6 @@
 # load shared objects; registration is via src/init.c file; the names of the
-# registered symbols have prefix "F_" such that they are easily recognizable
-useDynLib(rsae, .registration = TRUE, .fixes = "F_")
+# registered symbols have prefix "C_" such that they are easily recognizable
+useDynLib(rsae, .registration = TRUE, .fixes = "C_")
 
 # import
 importFrom("graphics",
