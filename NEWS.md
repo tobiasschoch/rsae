@@ -1,4 +1,4 @@
-# CHANGES in rsae VERSION 0.3 (2024-01-23)
+# CHANGES in rsae VERSION 0.3 (2024-02-02)
 
 ## Changes
 

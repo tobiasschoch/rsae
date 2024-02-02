@@ -1,22 +1,24 @@
-CC         = gfortran
-CFLAGS     = -g -O2 -fPIC
-R_DIR      = /usr/lib64/R
-DLL_BLAS   = $(R_DIR)/lib/libRblas.so
-DLL_LAPACK = $(R_DIR)/lib/libRlapack.so
-DLL_R      = $(R_DIR)/lib/libR.so
+FC		:= gfortran
+FFLAGS	:= -g -O2 -fPIC -mtune=native
+LD		:= $(FC)
+RM 		:= rm -f
+
+R_DIR      := /usr/lib64/R
+DLL_BLAS   := $(R_DIR)/lib/libRblas.so
+DLL_LAPACK := $(R_DIR)/lib/libRlapack.so
+DLL_R      := $(R_DIR)/lib/libR.so
 
 # Link
-OBJ = rsae.o zero_rc.o
+OBJ := rsae.o zero_rc.o
 
 rsae.so : $(OBJ)
-	$(CC) -shared -o $@ -L $(DLL_BLAS) $(DLL_LAPACK) $(DLL_R) $(OBJ)
+	$(LD) -shared -o $@ -L $(DLL_BLAS) $(DLL_LAPACK) $(DLL_R) $(OBJ)
 
 # Compile
 %.o : %.f90
-	$(CC) -Wall -pedantic $(CFLAGS) -c $< -o $@
+	$(FC) -Wall -pedantic $(FFLAGS) -c $< -o $@
 
 # Housekeeping
 .PHONY: clean
 clean:
-	rm $(OBJ) rsae.so
-
+	$(RM) $(OBJ) rsae.so *.mod

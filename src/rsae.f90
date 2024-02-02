@@ -26,6 +26,60 @@
 !                   Richard Brents zeroin.f (GPL; see file 'rsaeext.f90')
 !
 !===============================================================================
+module blas_lapack
+    implicit none
+    public
+
+    interface
+        subroutine dgels(trans, m, n, nrhs, a, lda, b, ldb, work, lwork, info)
+            integer     :: m, n, nrhs, lda, ldb, lwork, info
+            character   :: trans
+            double precision, dimension( lda, * )   :: a
+            double precision, dimension( ldb, * )   :: b
+            double precision, dimension( * )        :: work
+        end subroutine
+
+        subroutine dgemv(trans, m, n, alpha, a, lda, x, incx, beta, y, incy)
+            integer     :: m, n, lda, incx, incy
+            character   :: trans
+            double precision                        :: alpha, beta
+            double precision, dimension( lda, * )   :: a
+            double precision, dimension( * )        :: x
+            double precision, dimension( * )        :: y
+        end subroutine
+
+        subroutine dsyrk(uplo, trans, n, k, alpha, a, lda, beta, c, ldc)
+            integer     :: n, k, lda, ldc
+            character                               :: uplo, trans
+            double precision                        :: alpha, beta
+            double precision, dimension( lda, * )   :: a
+            double precision, dimension( ldc, * )   :: c
+        end subroutine
+
+        subroutine dpotri(uplo, n, a, lda, info)
+            integer     :: n, lda, info
+            character   uplo
+            double precision, dimension( lda, * )   :: a
+        end subroutine
+
+        subroutine dpotrf (uplo, n, a, lda, info)
+            integer     :: n, lda, info
+            character   :: uplo
+            double precision, dimension( lda, * )   :: a
+        end subroutine
+
+        subroutine dtrmm (side, uplo, transa, diag, m, n, alpha, a, lda, b, &
+                          ldb)
+            integer     :: m, n, lda, ldb
+            character   :: side, uplo, transa, diag
+            double precision                        :: alpha
+            double precision, dimension( lda, * )   :: a
+            double precision, dimension( ldb, * )   :: b
+        end subroutine
+
+    end interface
+end module blas_lapack
+
 !SUBROUTINE:   dconvumtofull
 !DESCRIPTION:  convert a upper triagular matrix to a full matrix
 !ON ENTRY:
@@ -62,7 +116,8 @@ end subroutine
 !   REAL beta(p), sumwgt(1)
 !-------------------------------------------------------------------------------
 subroutine drsaebeta(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, d, &
-        nsize, beta, sumwgt, info, dec, decorr)
+                     nsize, beta, sumwgt, info, dec, decorr)
+    use blas_lapack
     implicit none
     integer, intent(in) :: n, p, g, dec, decorr, lwork_dgels
     integer, intent(in) :: nsize(g)
@@ -94,7 +149,7 @@ subroutine drsaebeta(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, d, &
         end do
     end do
     call dgels("N", n, p, 1, modxmat, n, modyvec, n, work_dgels, lwork_dgels, &
-        info)
+               info)
     if (info == 0) then
         beta = modyvec(1:p)
     else
@@ -112,7 +167,8 @@ end subroutine
 !   REAL predfe(g), predre(g)
 !-------------------------------------------------------------------------------
 subroutine drsaehubpredict(n, p, g, nsize, k, kappa, d, v, beta, yvec, &
-        xmat, predfe, predre, dec)
+                           xmat, predfe, predre, dec)
+    use blas_lapack
     implicit none
     integer, intent(in) :: n, p, g, dec
     integer, intent(in) :: nsize(g)
@@ -179,6 +235,7 @@ end subroutine
 !   REAL amat(n,p)
 !-------------------------------------------------------------------------------
 subroutine dsqrtinvva(n, p, g, nsize, d, v, par, dec, decorr, amat)
+    use blas_lapack
     implicit none
     integer, intent(in) :: n, p, g, par, dec, decorr
     integer, intent(in) :: nsize(g)
@@ -258,7 +315,7 @@ subroutine dsqrtinvva(n, p, g, nsize, d, v, par, dec, decorr, amat)
             end do
             call dpotrf("U", nsize(i), winvv, nsize(i), info)
             call dtrmm("L", "U", "N", "N", nsize(i), p, 1d0, winvv, &
-                nsize(i), amat(l(i) : u(i), :), nsize(i))
+                       nsize(i), amat(l(i) : u(i), :), nsize(i))
             deallocate(winvv)
         end do
         if (par == 0) then
@@ -316,7 +373,8 @@ end function is_converged
 !   REAL beta(p), sumwgt(1)
 !-------------------------------------------------------------------------------
 subroutine drsaebetaiter(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, &
-        d, nsize, acc, beta, iter, converged, sumwgt, info, dec, decorr)
+                         d, nsize, acc, beta, iter, converged, sumwgt, info, &
+                         dec, decorr)
     implicit none
     integer, intent(in) :: n, p, g, dec, decorr, lwork_dgels
     integer, intent(in) :: nsize(g)
@@ -336,7 +394,7 @@ subroutine drsaebetaiter(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, &
     do i = 1, iter
         betaold = beta
         call drsaebeta(n, p, g, lwork_dgels, k, xmat, yvec, work_dgels, v, d, &
-            nsize, beta, sumwgt, coinfo, dec, decorr)
+                       nsize, beta, sumwgt, coinfo, dec, decorr)
         if (coinfo /= 0) then
             beta = 0
             exit
@@ -352,7 +410,7 @@ end subroutine
 !===============================================================================
 !SUBROUTINE:   drsaehubvariance
 !DESCRIPTION:  robust prediction of random effects
-!DEPENDENCY:   dsqrtinvva, dsyrk(BLAS), dtrtri(LAPACK)
+!DEPENDENCY:   dsqrtinvva, dsyrk(BLAS)
 !ON ENTRY:
 !  INTEGER
 !  REAL
@@ -360,6 +418,7 @@ end subroutine
 !  REAL
 !-------------------------------------------------------------------------------
 subroutine drsaehubvariance(n, p, g, nsize, v, d, xmat, vcovbeta, dec)
+    use blas_lapack
     implicit none
     integer, intent(in) :: n, p, g, dec
     integer, intent(in) :: nsize(g)
@@ -430,7 +489,7 @@ end subroutine
 !ON RETURN: REAL eval(1)
 !-------------------------------------------------------------------------------
 subroutine drsaehubdest(n, g, nsize, d, v, k, kappa, res, eval, dec, &
-        decorr)
+                        decorr)
     implicit none
     integer, intent(in) :: n, g, dec, decorr
     integer, intent(in) :: nsize(g)
@@ -480,8 +539,7 @@ end subroutine
 !   INTEGER info(1)
 !   REAL v(1), sumwgt(1)
 !-------------------------------------------------------------------------------
-subroutine drsaehubvest(n, niter, v, k, acc, kappa, stdres, &
-        sumwgt, info)
+subroutine drsaehubvest(n, niter, v, k, acc, kappa, stdres, sumwgt, info)
     implicit none
     integer, intent(in) :: n
     integer, intent(in) :: niter
@@ -588,8 +646,9 @@ end subroutine
 !   REAL:    tau(p+2), taurecord(niter, p+2)
 !-------------------------------------------------------------------------------
 subroutine drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
-        acc, sumwgt, xmat, yvec, k, kappa, epsd, tau, taurecord, &
-        allconverged, dec, decorr)
+                    acc, sumwgt, xmat, yvec, k, kappa, epsd, tau, taurecord, &
+                    allconverged, dec, decorr)
+    use blas_lapack
     implicit none
     integer, intent(in) :: n, p, g, dec, decorr
     integer, intent(in) :: niter
@@ -635,8 +694,8 @@ subroutine drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
         oldtau(p + 2) = tau(p + 2)
         ! compute regression coefficients
         call drsaebetaiter(n, p, g, lwork_dgels, k(1), xmat, yvec, work_dgels, &
-            tau(p + 1), tau(p + 2), nsize, acc(1), tau(1:p), iter(1), &
-            convergedbeta, sumwgt(1), work, dec, decorr)
+                           tau(p + 1), tau(p + 2), nsize, acc(1), tau(1:p), &
+                           iter(1), convergedbeta, sumwgt(1), work, dec, decorr)
         iterrecord(i, 1) = work
         if (convergedbeta /= 1) then
             iterrecord(1, i) = (-1) * iterrecord(1, i)
@@ -647,10 +706,10 @@ subroutine drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
         stdres = res
         ! std. residuals
         call dsqrtinvva(n, 1, g, nsize, tau(p + 2), tau(p + 1), 1, dec, &
-            decorr, stdres)
+                        decorr, stdres)
         ! variance component v (unit-level errors)
         call drsaehubvest(n, iter(2), tau(p + 1), k(2), acc(2), kappa(1), &
-            stdres, sumwgt(2), work)
+                          stdres, sumwgt(2), work)
         iterrecord(i, 2) = work
         if (monitord == 1) then
             tau(p + 2) = 0d0
@@ -659,7 +718,8 @@ subroutine drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
             upper = tau(p + 2) * 1d1
             ! ratio of variance components
             call drsaehubdestiter(n, g, nsize, tau(p + 1), k(3), kappa(2), &
-                res, 0d0, upper, acc(3), tau(p + 2), work, dec, decorr)
+                                  res, 0d0, upper, acc(3), tau(p + 2), work, &
+                                  dec, decorr)
             iterrecord(i, 3) = work
             if (sum(taurecord(max(i - 2, 1):i, p + 2)) < 3 * epsd .and. &
                     i >= 3) then
@@ -675,7 +735,7 @@ subroutine drsaehub(n, p, g, niter, nsize, iter, iterrecord, allacc, &
     end do
     sumwgtres = res
     call dsqrtinvva(n, 1, g, nsize, tau(p + 2), tau(p + 1), 0, dec, &
-        decorr, sumwgtres)
+                    decorr, sumwgtres)
     call dhuberwgt(n, k(3), 0, sumwgtres)
     sumwgt(3) = 0d0
     do j = 1, n
@@ -697,8 +757,9 @@ end subroutine
 !ON RETURN:
 !   REAL res(n), stdres(n), wgt(n)
 !-------------------------------------------------------------------------------
-subroutine drsaeresid(n, p, g, nsize, k, tau, u, xmat, yvec, res, &
-        stdres, wgt, dec)
+subroutine drsaeresid(n, p, g, nsize, k, tau, u, xmat, yvec, res, stdres, &
+                      wgt, dec)
+    use blas_lapack
     implicit none
     integer, intent(in) :: n, p, g, dec
     integer, intent(in) :: nsize(g)
@@ -785,6 +846,7 @@ end subroutine
 !   REAL beta(p), s(1)
 !-------------------------------------------------------------------------------
 subroutine drlm(n, p, xmat, yvec, k, beta, s, info, niter, acc)
+    use blas_lapack
     implicit none
     integer, intent(in) :: n, p, niter
     integer, intent(out) :: info
@@ -829,7 +891,7 @@ subroutine drlm(n, p, xmat, yvec, k, beta, s, info, niter, acc)
             end do
         end do
         call dgels("N", n, p, 1, modxmat, n, modyvec, n, work_dgels, &
-            lwork_dgels, info)
+                   lwork_dgels, info)
         if (info == 0) then
             beta = modyvec(1:p)
         else
@@ -858,7 +920,7 @@ end subroutine
 !   REAL zeroin(1)
 !-------------------------------------------------------------------------------
 subroutine drsaehubdestiter(n, g, nsize, v, k, kappa, res, lower, upper, &
-        tol, zeroin, info, dec, decorr)
+                            tol, zeroin, info, dec, decorr)
     implicit none
     !zeroin declarations
     integer, intent(out) :: info
@@ -875,9 +937,9 @@ subroutine drsaehubdestiter(n, g, nsize, v, k, kappa, res, lower, upper, &
 
     !evaluate the function at the interval borders (lower, upper)
     call drsaehubdest(n, g, nsize, lower, v, k, kappa, res, f_lower, dec, &
-        decorr)
+                      decorr)
     call drsaehubdest(n, g, nsize, upper, v, k, kappa, res, f_upper, dec, &
-        decorr)
+                      decorr)
     !stop if there is no sign change of the functions values over the interval
     if ((f_lower > 0d0 .and. f_upper > 0d0) .or. &
             (f_lower < 0d0 .and. f_upper < 0d0)) then
@@ -901,7 +963,7 @@ subroutine drsaehubdestiter(n, g, nsize, v, k, kappa, res, lower, upper, &
         end if
         !evaluate function at arg
         call drsaehubdest(n, g, nsize, arg, v, k, kappa, res, f_value, &
-            dec, decorr)
+                          dec, decorr)
     end do
     zeroin = arg
 end subroutine
