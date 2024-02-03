@@ -136,8 +136,13 @@ Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm
 }
 
 \examples{
-# generate a model with synthetic data
-model <- makedata()
+# use the landsat data
+head(landsat)
+
+# define the saemodel using the landsat data
+model <- saemodel(formula = HACorn ~ PixelsCorn + PixelsSoybeans,
+    area = ~CountyName,
+    data = subset(landsat, subset = (outlier == FALSE)))
 
 # summary of the model
 summary(model)
