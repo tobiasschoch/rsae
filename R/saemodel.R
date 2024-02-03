@@ -30,7 +30,7 @@ saemodel <- function(formula, area, data, type = "b", na.omit = FALSE)
 .saemodel_unit <- function(formula, area, data, na.omit)
 {
     mf <- model.frame(formula, data, na.action = ifelse(na.omit, "na.omit",
-        "na.fail"))
+                                                        "na.fail"))
     mt <- attr(mf, "terms")
     y <- as.numeric(model.response(mf, "numeric"))
     X <- model.matrix(mt, mf)
@@ -49,8 +49,8 @@ saemodel <- function(formula, area, data, type = "b", na.omit = FALSE)
     nsize <- unname(table(areaID))
 
     model <- list(X = mod[, 2:(p + 1)], y = mod[, 1], nsize = nsize,
-        areaID = mod[, (p + 2)], g = length(nsize), p = p, n = length(y),
-        intercept = attr(mt, "intercept"))
+                  areaID = mod[, (p + 2)], g = length(nsize), p = p,
+                  n = length(y), intercept = attr(mt, "intercept"))
     colnames(model$X) <- colnames(X)
     attr(model, "areaNames") <- levels(areaID)
     attr(model, "yname") <- paste(formula)[[2]]
@@ -67,7 +67,7 @@ print.saemodel <- function(x, ...)
     if (is.null(attr(x, "contam"))) {
         cat("SAE MODEL TYPE: B (J.N.K. Rao's classification)\n---\n")
         cat(paste0("FIXED EFFECTS: ", attr(x, "yname"), " ~ ",
-            paste0(attr(x, "xnames"), collapse = " + ")), "\n")
+                   paste0(attr(x, "xnames"), collapse = " + ")), "\n")
         cat(paste0("AREA-SPECIFIC RANDOM EFFECTS: ", attr(x, "areadef")), "\n")
     } else {
         skeleton <- attr(x, "contam")$skeleton
@@ -115,13 +115,13 @@ summary.saemodel <- function(object, ...)
     print(attr(object, "call"))
     cat("---\n")
     nsize <- object$nsize
-    cat("No. of areas: ", length(nsize), "\n")
+    cat("No. of areas:", length(nsize), "\n")
     cat("No. of obs.: ", sum(nsize), "\n")
     if (length(unique(nsize)) == 1) {
-        cat("Balanced data, each area has ", nsize[1], " units \n")
+        cat("Balanced data, each area has", nsize[1], "units \n")
     } else {
-        cat("Smallest area: ", min(nsize), " units \n")
-        cat("Largest area: ", max(nsize), " units \n")
+        cat("Smallest area:", min(nsize), "units \n")
+        cat("Largest area: ", max(nsize), "units \n")
     }
 }
 # S3 method to extract the data as matrix

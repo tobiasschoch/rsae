@@ -75,8 +75,14 @@ Rao, J.N.K. (2003). \emph{Small Area Estimation}, New York: John Wiley and Sons.
     \code{\link[=fitsaemodel]{fitsaemodel()}}
 }
 \examples{
-data("landsat")
+# use the landsat datsa
+head(landsat)
+
+# set up the model
 model <- saemodel(formula = HACorn ~ PixelsCorn + PixelsSoybeans,
     area = ~CountyName,
     data = subset(landsat, subset = (outlier == FALSE)))
+
+# summar of the model
+summary(model)
 }

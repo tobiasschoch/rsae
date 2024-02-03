@@ -106,5 +106,10 @@ Stahel, W. A. and A. Welsh (1997).
     \code{\link[=fitsaemodel]{fitsaemodel()}}
 }
 \examples{
-mymodel <- makedata()
+# generate a model with synthetic data
+model <- makedata()
+model
+
+# summary of the model
+summary(model)
 }

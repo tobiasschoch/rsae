@@ -65,3 +65,20 @@ fitsaemodel.control(niter = 40, iter = c(200, 200), acc = 1e-05,
 \seealso{
     \code{\link[=fitsaemodel]{fitsaemodel()}}
 }
+\examples{
+# use the landsat data
+head(landsat)
+
+# define the saemodel using the landsat data
+model <- saemodel(formula = HACorn ~ PixelsCorn + PixelsSoybeans,
+    area = ~CountyName,
+    data = subset(landsat, subset = (outlier == FALSE)))
+
+# summary of the model
+summary(model)
+
+# obtain the maximum likelihood estimates with, for instance, 'niter = 50'
+# number of outer-loop iterations (by default: niter = 40). Here, we use
+# 'niter = 50' for the sake of demonstration, not because it is needed.
+fitsaemodel("ml", model, niter = 50)
+}

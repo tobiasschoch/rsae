@@ -16,7 +16,8 @@ fitsaemodel <- function(method, model, ...)
 }
 # control function used in fitsaemodel
 fitsaemodel.control <- function(niter = 40, iter = c(200, 200), acc = 1e-5,
-    dec = 0, decorr = 0, init = "default", k_Inf = 20000, ...)
+                                dec = 0, decorr = 0, init = "default",
+                                k_Inf = 20000, ...)
 {
     stopifnot(all(acc > 0), all(iter > 0), length(niter) == 1, niter > 0,
         dec %in% c(0, 1), decorr %in% c(0, 1), k_Inf > 0, is.finite(k_Inf))
@@ -32,5 +33,5 @@ fitsaemodel.control <- function(niter = 40, iter = c(200, 200), acc = 1e-5,
     init <- switch(match.arg(init, c("default", "lts", "s")),
         "default" = 0, "lts" = 1, "s" = 2)
     list(niter = niter, iter = iter, acc = acc, k_Inf = k_Inf, init = init,
-        dec = dec, decorr = decorr, add = list(...))
+         dec = dec, decorr = decorr, add = list(...))
 }

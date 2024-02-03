@@ -1,10 +1,10 @@
 makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
-    areaID = NULL, ve = 1, ve.contam = 41, ve.epsilon = 0, vu = 1,
-    vu.contam = 41, vu.epsilon = 0)
+                     areaID = NULL, ve = 1, ve.contam = 41, ve.epsilon = 0,
+                     vu = 1, vu.contam = 41, vu.epsilon = 0)
 {
     stopifnot(is.numeric(beta), n > 0, g > 0, is.numeric(seed), is.numeric(ve),
-        is.numeric(ve.contam), is.numeric(ve.epsilon), is.numeric(vu),
-        is.numeric(vu.contam), is.numeric(vu.epsilon))
+              is.numeric(ve.contam), is.numeric(ve.epsilon), is.numeric(vu),
+              is.numeric(vu.contam), is.numeric(vu.epsilon))
     # prepare the area-size-specific issues
     if (is.null(areaID)) {
         N <- n * g
@@ -49,7 +49,7 @@ makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
         # un-contaminated observations
         non.outliers <- setdiff(1:N, outliers)
         y[non.outliers] <- y[non.outliers] + rnorm(length(non.outliers), 0,
-            sqrt(ve))
+                                                   sqrt(ve))
     }
     # y as list
     y.list <- split(y, areaID)
@@ -65,15 +65,15 @@ makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
         non.outlyingAreas <- setdiff(1:g, outlyingAreas)
         r <- as.list(1:g)
         r[outlyingAreas] <- lapply(y.list[outlyingAreas], addraneff,
-            s = sqrt(vu.contam))
+                                   s = sqrt(vu.contam))
         r[non.outlyingAreas] <- lapply(y.list[non.outlyingAreas], addraneff,
-            s = sqrt(vu))
+                                       s = sqrt(vu))
     }
     # y as vector (not list) again
     y <- unsplit(r, areaID)
     # prepare return value
     res <- list(y = y, X = x, areaID = areaID, nsize = n, g = g, p = p, n = N,
-        intercept = hasintercept)
+                intercept = hasintercept)
     attr(res, "areaNames") <- paste0(rep("A", g), 1:g)
     attr(res, "areadef") <- "area-specific ranef"
     attr(res, "yname") <- "y"
@@ -82,9 +82,10 @@ makedata <- function(seed = 1024, intercept = 1, beta = 1, n = 4, g = 20,
     class(res) <- "saemodel"
     # additional attributes (do not belong to the "saemodel" class)
     skeleton <- list(intercept = intercept, beta = beta, ve = ve, n = n,
-        g = g, vu = vu, ve.contam = ve.contam, ve.epsilon = ve.epsilon,
-        vu.contam = vu.contam, vu.epsilon = vu.epsilon)
+                     g = g, vu = vu, ve.contam = ve.contam,
+                     ve.epsilon = ve.epsilon, vu.contam = vu.contam,
+                     vu.epsilon = vu.epsilon)
     attr(res, "contam") <- list(skeleton = skeleton,
-        outlyingAreas = outlyingAreas)
+                                outlyingAreas = outlyingAreas)
     res
 }

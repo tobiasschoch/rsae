@@ -33,7 +33,7 @@ convergence(object)
         \code{print()} and \code{summary()} methods.}
     \item{object}{an object of class \code{"fit_model_b"}.}
     \item{x}{an object of class \code{"fit_model_b"}.}
-    \item{type}{\code{[character]} name effects to be extracted
+    \item{type}{\code{[character]} name of the effects to be extracted
         by the \code{coef} method; it can take one of the
         following possibilities: \code{"both"} (extracts fixed and random
         effects; default), \code{"ranef"} (only random effects), or
@@ -136,13 +136,31 @@ Schoch, T. (2012). Robust Unit-Level Small Area Estimation: A Fast Algorithm
 }
 
 \examples{
-# generate synthetic data
-m <- makedata()
+# generate a model with synthetic data
+model <- makedata()
+
+# summary of the model
+summary(model)
+
+# maximum likelihood estimates
+fitsaemodel("ml", model)
 
 # Huber M-estimate with robustness tuning constant k = 2
-m_fitted <- fitsaemodel("huberm", m, k = 2)
-m_fitted
+m <- fitsaemodel("huberm", model, k = 2)
+m
 
-# summary of the fitted model
-summary(m_fitted)
+# summary of the fitted model/ estimates
+summary(m)
+
+# obtain more information about convergence
+convergence(m)
+
+# extract the fixed effects
+coef(m, "fixef")
+
+# extract the random effects
+coef(m, "ranef")
+
+# extract both
+coef(m)
 }

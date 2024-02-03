@@ -5,7 +5,7 @@
 }
 # workhorse function
 .fit_model_b_huberm <- function(method, model, k,
-    control = fitsaemodel.control(...), ...)
+                                control = fitsaemodel.control(...), ...)
 {
     # methods: 'ml' vs. 'huberm'
     if (method == "ml") {
@@ -18,7 +18,7 @@
         if (is.list(k)) {
             if (any(is.na(match(names(k), c("beta", "v", "d")))))
                 stop("k can be list with named entries 'beta', 'v', and 'd'\n",
-                    call. = FALSE)
+                     call. = FALSE)
             k <- c(k$beta, k$v, k$d)
             stopifnot(all(is.numeric(k)), all(k) > 0)
             kappa <- c(.computekappa(k[2]), .computekappa(k[3]))
@@ -29,8 +29,8 @@
             k <- rep(k, 3)
             k.report <- k[1]
         }
-        methodName <- list(type = "Huber-type M-estimation", tuning =
-            list(k = k.report))
+        methodName <- list(type = "Huber-type M-estimation",
+                           tuning = list(k = k.report))
     }
     # initialize the full parameter vector
     init <- if (length(control$add) == 0)
@@ -40,17 +40,18 @@
     # compute estimates
     taurecord <- matrix(0, control$niter, (model$p + 2))
     eps <- .Machine$double.eps
-    tmp <- .C(C_drsaehub, n = as.integer(model$n),
-        p = as.integer(model$p), g = as.integer(model$g),
-        niter = as.integer(control$niter), nsize = as.integer(model$nsize),
-        iter = as.integer(control$iter), iterrecord = as.matrix(matrix(0,
-        control$niter, 3)), allacc = as.double(control$acc[1]),
-        acc = as.matrix(control$acc[2:4]), sumwgt = as.matrix(rep(0, 3)),
-        xmat = as.matrix(model$X), yvec = as.matrix(model$y),
-        k = as.matrix(k), kappa = as.matrix(kappa),
-        epsd = as.double(eps^(1 / 4)), tau = as.matrix(init),
-        taurecord = as.matrix(taurecord), converged = as.integer(0),
-        dec = as.integer(control$dec), decorr = as.integer(control$decorr))
+    tmp <- .C(C_drsaehub, n = as.integer(model$n), p = as.integer(model$p),
+              g = as.integer(model$g), niter = as.integer(control$niter),
+              nsize = as.integer(model$nsize), iter = as.integer(control$iter),
+              iterrecord = as.matrix(matrix(0, control$niter, 3)),
+              allacc = as.double(control$acc[1]),
+              acc = as.matrix(control$acc[2:4]), sumwgt = as.matrix(rep(0, 3)),
+              xmat = as.matrix(model$X), yvec = as.matrix(model$y),
+              k = as.matrix(k), kappa = as.matrix(kappa),
+              epsd = as.double(eps^(1 / 4)), tau = as.matrix(init),
+              taurecord = as.matrix(taurecord), converged = as.integer(0),
+              dec = as.integer(control$dec),
+              decorr = as.integer(control$decorr))
     # check for cycling an choose the parameter-vector estimate whose
     # estimate of v is closer to the (robust) init (i.e., either the "lts" or
     # "s" estimate) value. This method is not supported for init=default or ml
@@ -79,13 +80,15 @@
         tau <- rep(NA_real_, p + 2)
 
     res <- list(beta = tau[1:p], theta = c(tau[p+1], tau[p + 1] * tau[p + 2]),
-        converged = converged)
+                converged = converged)
     # additional attributes
-    attr(res, "optim") <- list(acc = control$acc, niter = c(control$niter,
-        control$iter), usediter = tmp$iterrecord, tau = tmp$taurecord,
-        kappa = kappa)
+    attr(res, "optim") <- list(acc = control$acc,
+                               niter = c(control$niter, control$iter),
+                               usediter = tmp$iterrecord,
+                               tau = tmp$taurecord, kappa = kappa)
     if (method == "huberm")
         attr(res, "robustness") <- list(wgt = tmp$sumwgt)
+
     attr(res, "init") <- init
     attr(res, "method") <- methodName
     attr(res, "saemodel") <- model
@@ -117,12 +120,12 @@
         # some magic numbers
         k <- 1.345; acc <- 0.00001; niter <- 20
         # compute the robust fixed-effects estimator
-        tmp <- .C(C_drlm, n = as.integer(model$n),
-            p = as.integer(p + g), xmat = as.matrix(cbind(X_centered, mm)),
-            yvec = as.matrix(y_centered), k = as.double(k),
-            beta = as.matrix(rep(1, (p + g))), s = as.double(1.2),
-            info = as.integer(1), niter = as.integer(niter),
-            acc = as.double(acc))
+        tmp <- .C(C_drlm, n = as.integer(model$n), p = as.integer(p + g),
+                  xmat = as.matrix(cbind(X_centered, mm)),
+                  yvec = as.matrix(y_centered), k = as.double(k),
+                  beta = as.matrix(rep(1, (p + g))), s = as.double(1.2),
+                  info = as.integer(1), niter = as.integer(niter),
+                  acc = as.double(acc))
         res <- c(0, tmp$beta[1:p], tmp$s^2, 100)
     }
     #-------------
@@ -151,7 +154,7 @@
     if (init == 2) {
         control <- robustbase::lmrob.control(...)
         tmp <- robustbase::lmrob.S(x = as.matrix(model$X), y = model$y,
-            control = control)
+                                   control = control)
         res <- as.numeric(c(tmp$coefficients, tmp$scale^2, 1))
     }
     res
@@ -182,11 +185,11 @@ print.fit_model_b <- function (x, digits = max(3L, getOption("digits") - 3L),
             cat("Robustness tuning constant: k =", tuning, "\n")
         else
             cat(paste0("Robustness tuning constants: k_beta = ", tuning[1],
-                ", k_v = ", tuning[2], ", k_d = ", tuning[3],"\n"))
+                       ", k_v = ", tuning[2], ", k_d = ", tuning[3],"\n"))
     }
     cat("---\nFixed effects\n")
     cat(paste0("Model: ", attr(saemodel, "yname"), " ~ ",
-        paste0(attr(saemodel, "xnames"), collapse = " + ")), "\n")
+               paste0(attr(saemodel, "xnames"), collapse = " + ")), "\n")
     cat("\nCoefficients: \n")
     beta <- x$beta
     names(beta) <- attr(saemodel, "xnames")
@@ -215,7 +218,7 @@ print.fit_model_b <- function (x, digits = max(3L, getOption("digits") - 3L),
     theta <- as.matrix(theta)
     colnames(theta) <- "Std. Dev."
     print.default(format(t(theta), digits = digits), print.gap = 2,
-        quote = FALSE)
+                  quote = FALSE)
     cat("---\nNumber of Observations: ", saemodel$n, "\nNumber of Areas: ",
         saemodel$g, "\n\n")
     invisible(x)
@@ -227,17 +230,18 @@ summary.fit_model_b <- function (object, ...)
     model <- attr(object, "saemodel")
     vcovbeta <- if (object$converged == 1)
         .C(C_drsaehubvariance, n = as.integer(model$n),
-            p = as.integer(model$p), g = as.integer(model$g),
-            nsize = as.integer(model$nsize), v = as.double(object$theta[1]),
-            d = as.double(object$theta[2] / object$theta[1]),
-            xmat = as.matrix(model$X), vcovbeta = as.matrix(matrix(0,
-            model$p, model$p)), dec = as.integer(attr(object, "dec")))$vcovbeta
+           p = as.integer(model$p), g = as.integer(model$g),
+           nsize = as.integer(model$nsize), v = as.double(object$theta[1]),
+           d = as.double(object$theta[2] / object$theta[1]),
+           xmat = as.matrix(model$X),
+           vcovbeta = as.matrix(matrix(0, model$p, model$p)),
+           dec = as.integer(attr(object, "dec")))$vcovbeta
     else
         matrix(NA_real_, model$p, model$p)
 
     method <- attr(object, "method")
-    res <- list(converged = object$converged, method = method,
-        vcovbeta = vcovbeta)
+    res <- list(converged = object$converged, method = method, vcovbeta =
+                vcovbeta)
     #----------------------
     # fixed effects table
     saemodel <- attr(object, "saemodel")
@@ -277,8 +281,8 @@ print.summary_fit_model_b <- function(x, digits = max(3L, getOption("digits")
         if (length(tuning) == 1)
             cat("Robustness tuning constant: k =", tuning, "\n")
         else
-            cat(paste0("Robustness tuning constants: k_beta = ", tuning[1],
-                ", k_v = ", tuning[2], ", k_d = ", tuning[3],"\n"))
+            cat(paste0("Robustness tuning constants: k_beta = ", tuning[1], ",
+                       k_v = ", tuning[2], ", k_d = ", tuning[3],"\n"))
     }
     cat("---\nFixed effects\n")
     printCoefmat(x$tTable, digits = digits, P.values = TRUE,
@@ -286,7 +290,7 @@ print.summary_fit_model_b <- function(x, digits = max(3L, getOption("digits")
     if (!is.null(x$wgt)) {
         cat("---\nDegree of downweighting/winsorization:\n\n")
         print.default(format(t(x$wgt), digits = digits), print.gap = 2,
-            quote = FALSE)
+                      quote = FALSE)
     }
 }
 # S3 coef method to extract the coefficients

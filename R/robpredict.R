@@ -1,11 +1,11 @@
-robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
-        seed = 1024, progress_bar = TRUE)
+robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL, seed =
+                       1024, progress_bar = TRUE)
 {
     if (!inherits(fit, "fit_model_b"))
         stop("fit must be of class 'fit_model_b'", call. = FALSE)
     if (fit$converged == 0)
         stop(paste0("Prediction is not possible because algorithm\n",
-            "of fitted model did not converge\n\n"), call. = FALSE)
+                    "of fitted model did not converge\n\n"), call. = FALSE)
 
     model <- attr(fit, "saemodel")          # sae model
     dec <- attr(fit, "dec")                 # type of decomposition
@@ -26,12 +26,12 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     # preparations for fortran-call
     predre <- predfe <- rep(0, model$g)
     tmp <- .C(C_drsaehubpredict, n = as.integer(model$n),
-        p = as.integer(model$p), g = as.integer(model$g),
-        nsize = as.integer(model$nsize), k = as.double(k),
-        kappa = as.double(kappa), d = as.double(d), v = as.double(v),
-        beta = as.matrix(fit$beta), yvec = as.matrix(model$y),
-        xmat = as.matrix(model$X), predfe = as.matrix(predfe),
-        predre = as.matrix(predre), dec = as.integer(dec))
+              p = as.integer(model$p), g = as.integer(model$g),
+              nsize = as.integer(model$nsize), k = as.double(k),
+              kappa = as.double(kappa), d = as.double(d), v = as.double(v),
+              beta = as.matrix(fit$beta), yvec = as.matrix(model$y),
+              xmat = as.matrix(model$X), predfe = as.matrix(predfe),
+              predre = as.matrix(predre), dec = as.integer(dec))
     # predicted area-level random effects
     raneff <- tmp$predre
     # branch: old vs new data
@@ -64,15 +64,16 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     tau <- c(fit$beta, v, d)
     vn <- numeric(model$n)
     getres <- .C(C_drsaeresid, n = as.integer(model$n),
-        p = as.integer(model$p), g = as.integer(model$g),
-        nsize = as.integer(model$nsize), k = as.double(k_fit),
-        tau = as.matrix(tau), u = as.matrix(raneff), xmat = as.matrix(model$X),
-        yvec = as.matrix(model$y), res = as.matrix(vn), stdres = as.matrix(vn),
-        wgt = as.matrix(vn), dec = as.integer(dec))
+                 p = as.integer(model$p), g = as.integer(model$g),
+                 nsize = as.integer(model$nsize), k = as.double(k_fit),
+                 tau = as.matrix(tau), u = as.matrix(raneff),
+                 xmat = as.matrix(model$X), yvec = as.matrix(model$y),
+                 res = as.matrix(vn), stdres = as.matrix(vn),
+                 wgt = as.matrix(vn), dec = as.integer(dec))
 
     result <- list(fixeff = fixeff, raneff = raneff, means = means,
-        res = getres$res, stdres = getres$stdres, wgt = getres$wgt,
-        mspe = mspe)
+                   res = getres$res, stdres = getres$stdres,
+                   wgt = getres$wgt, mspe = mspe)
     attr(result, "robustness") <- k
     attr(result, "fit") <- fit
     attr(result, "mspe") <- reps
@@ -90,12 +91,12 @@ robpredict <- function(fit, areameans = NULL, k = NULL, reps = NULL,
     d <- fit$theta[2] / v
     predre <- predfe <- rep(0, model$g)
     tmp <- .C(C_drsaehubpredict, n = as.integer(model$n),
-        p = as.integer(model$p), g = as.integer(model$g),
-        nsize = as.integer(model$nsize), k = as.double(k),
-        kappa = as.double(kappa), d = as.double(d), v = as.double(v),
-        beta = as.matrix(fit$beta), yvec = as.matrix(model$y),
-        xmat = as.matrix(model$X), predfe = as.matrix(predfe),
-        predre = as.matrix(predre), dec = as.integer(dec))
+              p = as.integer(model$p), g = as.integer(model$g),
+              nsize = as.integer(model$nsize), k = as.double(k),
+              kappa = as.double(kappa), d = as.double(d), v = as.double(v),
+              beta = as.matrix(fit$beta), yvec = as.matrix(model$y),
+              xmat = as.matrix(model$X), predfe = as.matrix(predfe),
+              predre = as.matrix(predre), dec = as.integer(dec))
     # predicted area-level random effects
     raneff <- tmp$predre
     fixeff <- as.matrix(areameans) %*% fit$beta
@@ -158,7 +159,8 @@ plot.pred_model_b <- function(x, type = "e", sort = NULL, ...)
     # sorting
     if (!is.null(sort)) {
         ord <- switch(sort, raneff = order(re), ranef = order(re),
-            fixeff = order(fe), fixef = order(fe), means = order(means))
+                      fixeff = order(fe), fixef = order(fe),
+                      means = order(means))
         re <- re[ord]
         fe <- fe[ord]
         means <- means[ord]
@@ -180,16 +182,16 @@ plot.pred_model_b <- function(x, type = "e", sort = NULL, ...)
         areaNames <- c(areaNames, "")
         op <- par(mfcol = c(1, 1), mar = c(4, 8, 2, 4))
         plot(means, 1:g, type = "b", col = 2, lwd = 2, axes = FALSE,
-            xlab = "predicted mean", ylab = "", xlim = ra,
-            main = "Predicted means")
+             xlab = "predicted mean", ylab = "", xlim = ra,
+             main = "Predicted means")
         lines(fe, 1:g, type = "b", col = 1, lwd = 2, xlim = ra)
         axis(2, seq(1, g), labels = areaNames, las = 1)
         axis(1)
         grid(col = "gray65", lty = 2, lwd = 1)
         box()
         legend("top", pch = c(1, 1), lty = c(1, 1), col = c(1, 2),
-            legend = c("fixeff prediction", "full prediction"),
-            bg = "white", ncol = 2)
+               legend = c("fixeff prediction", "full prediction"),
+               bg = "white", ncol = 2)
     } else {
         # with mspe
         if (is.na(match(type, c("e", "l"))))
@@ -198,20 +200,20 @@ plot.pred_model_b <- function(x, type = "e", sort = NULL, ...)
         ra <- range(means + sqrt(mspe), means - sqrt(mspe))
         op <- par(mfcol =c (1, 1), mar = c(8, 4, 2, 4))
         plot(1:g, means, type = "b", col = 2, lwd = 2, axes = FALSE,
-                xlab = "", ylab = "predicted area mean", ylim = ra,
-                main = "Predicted means (+/- SQRT[MSPE])")
+             xlab = "", ylab = "predicted area mean", ylim = ra,
+             main = "Predicted means (+/- SQRT[MSPE])")
         if (type == "l") {
             lines(1:g, means + sqrt(mspe), type = "b", col = 1, lwd = 2,
-                lty = 2, xlim = ra)
+                  lty = 2, xlim = ra)
             lines(1:g, means - sqrt(mspe), type = "b", col = 1, lwd = 2,
-                lty = 2, xlim = ra)
+                  lty = 2, xlim = ra)
         }
         if (type == "e") {
             arrows(1:g, means - sqrt(mspe), 1:g, means + sqrt(mspe),
-                angle = 90, code = 3, ...)
+                   angle = 90, code = 3, ...)
         }
         axis(1, seq(1, g), labels = abbreviate(areaNames, minlength = 12),
-            las = 2)
+             las = 2)
         axis(2)
         grid(col = "gray65", lty = 2, lwd = 1)
         box()
@@ -238,3 +240,23 @@ residuals.pred_model_b <- function(object, ...)
 {
     object$res
 }
+# S3 as.matrix method
+as.matrix.pred_model_b <- function(x, ...)
+{
+    mat <- cbind(x$fixeff, x$raneff, x$means) #  "mspe" 
+    colnames(mat) <- c("fixeff", "raneff", "mean")
+    mat
+}
+# S3 head method
+head.pred_model_b <- function(x, n = 6L, ...)
+{
+    head(as.matrix.pred_model_b(x), n, ...)
+}
+# S3 tail method
+tail.pred_model_b <- function(x, n = 6L, keepnums = TRUE, addrownums, ...)
+{
+    tail(as.matrix.pred_model_b(x), n, keepnums, addrownums, ...)
+}
+
+
+

@@ -71,6 +71,6 @@ Battese, G. E., Harter, R. M., and W.A. Fuller (1988).
     \doi{https://doi.org/10.2307/2288915}
 }
 \examples{
-data(landsat)
+head(landsat)
 }
 \keyword{datasets}

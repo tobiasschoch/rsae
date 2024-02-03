@@ -147,18 +147,30 @@ Sinha, S.K. and J.N.K. Rao (2009).
     \code{\link[=fitsaemodel]{fitsaemodel()}}
 }
 \examples{
-# generate synthetic data
-m <- makedata()
+# generate a model with synthetic data
+model <- makedata()
+
+# summary of the model
+summary(model)
 
 # Huber M-estimate with robustness tuning constant k = 2
-m_fit <- fitsaemodel("huberm", m, k = 2)
-m_fit
+m <- fitsaemodel("huberm", model, k = 2)
+m
 
-# summary of the fitted model
-summary(m_fit)
+# summary of the fitted model/ estimates
+summary(m)
 
-# robust prediction of the random effects and the area-level means; here,
-# we choose the robustness tuning constant k equal to 1.8
-m_predicted <- robpredict(m_fit, k = 1.8)
-m_predicted
+# robust prediction of the random effects and the area-level means (robust
+# EBLUP); here, we use the robustness tuning constant 'k = 1.8' for prediction
+m_predicted <- robpredict(m, k = 1.8)
+head(m_predicted)
+
+# extract residuals from the predictions
+head(residuals(m_predicted))
+
+# prediction incl. MSPE; parametric bootstrap with only 'reps = 10'
+# replications (for demonstration purposes; in practice, 'reps' should be
+# considerably larger)
+m_predicted_mspe <- robpredict(m, k = 1.8, reps = 10, progress_bar = FALSE)
+head(m_predicted_mspe)
 }

@@ -1,23 +1,22 @@
-#library(testthat)
 library(rsae)
 
 # functions that are required in the testing suite utility function
 all_equal <- function(target, current, label,
-    tolerance = sqrt(.Machine$double.eps), scale = NULL,
-    check.attributes = FALSE)
+                      tolerance = sqrt(.Machine$double.eps), scale = NULL,
+                      check.attributes = FALSE)
 {
     if (missing(label))
         stop("Argument 'label' is missing\n")
     res <- all.equal(target, current, tolerance, scale,
-        check.attributes = check.attributes)
+                     check.attributes = check.attributes)
     if (is.character(res))
         cat(paste0(label, ": ", res, "\n"))
 }
 
 data("landsat")
 bhfmodel <- saemodel(formula = HACorn ~ PixelsCorn + PixelsSoybeans,
-    area = ~CountyName,
-    data = subset(landsat, subset = (outlier == FALSE)))
+                     area = ~CountyName,
+                     data = subset(landsat, subset = (outlier == FALSE)))
 
 #-------------------------------------------------------------------------------
 # maximum likelihood estimator
@@ -71,7 +70,7 @@ ref_optim <- structure(c(52.093820500254687, 51.608102400640945,
 all_equal(ref_optim, attr(m, "optim")$tau, label = "mle: optim")
 # prediction
 d <- unique(landsat[-33, c("MeanPixelsCorn", "MeanPixelsSoybeans",
-    "CountyName")])
+                           "CountyName")])
 d <- cbind(rep(1,12), d); rownames(d) <- d$CountyName; d <- d[,1:3]
 pr <- robpredict(m, areameans = d)
 # prediction of fixed effects
@@ -144,7 +143,7 @@ ref_optim <- structure(c(52.093820500254687, 55.259882759244917,
 all_equal(ref_optim, attr(m, "optim")$tau, label = "huberm: optim")
 # prediction
 d <- unique(landsat[-33, c("MeanPixelsCorn", "MeanPixelsSoybeans",
-    "CountyName")])
+                           "CountyName")])
 d <- cbind(rep(1,12), d); rownames(d) <- d$CountyName; d <- d[,1:3]
 pr <- robpredict(m, areameans = d)
 # prediction of fixed effects
@@ -165,5 +164,4 @@ ref_pred_raneff <- structure(c(0.17828694239225723, 4.7943357066320891,
     13.08070103738811), .Dim = c(12L, 1L), .Dimnames = list(c("Cerro Gordo",
     "Hamilton", "Worth", "Humboldt", "Franklin", "Pocahontas", "Winnebago",
     "Wright", "Webster", "Hancock", "Kossuth", "Hardin"), NULL))
-all_equal(ref_pred_raneff, m_pred$raneff,
-    label = "huberm: prediction: raneff")
+all_equal(ref_pred_raneff, m_pred$raneff, label = "huberm: prediction: raneff")
