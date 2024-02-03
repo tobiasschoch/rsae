@@ -70,6 +70,9 @@ Battese, G. E., Harter, R. M., and W.A. Fuller (1988).
     \emph{Journal of the American Statistical Association} \bold{83}, 28--36.
     \doi{https://doi.org/10.2307/2288915}
 }
+\seealso{
+    \code{\link{landsat_means}}
+}
 \examples{
 head(landsat)
 }

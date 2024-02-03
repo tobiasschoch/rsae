@@ -1,14 +1,20 @@
-# CHANGES in rsae VERSION 0.3 (2024-02-02)
+# CHANGES in rsae VERSION 0.3 (2024-02-03)
 
-## Changes
+## CHANGES
 
-* Starting with version 0.3, the `rsae` package is distributed under the [GPLv3](https://www.r-project.org/Licenses/GPL-3) license (before it has been published under the BSD-3-Clause license).
+* Change of License: Starting with version 0.3, the `rsae` package is distributed under the [GPLv3](https://www.r-project.org/Licenses/GPL-3) license (before it was released under the BSD-3-Clause license).
 * For root finding, we now use the Fortran 90 routine `zero_rc` of John Burkardt (license: Lesser GPL).
 
 ## FIXES
 
-* Fixed Fortran compiler warnings
-* Fixed typos in the help files
+* Fixed Fortran compiler warnings and issues in the code
+* Updated and added examples in the help documentation
+* Fixed `colnames` of the return value of `as.matrix.saemodel()` and other (minor) issues in the R code.
+
+## NEW FEATURES
+
+* Added the utility functions `head()`, `tail()`, and `as.matrix()` to work with the predicted values (and the mean square prediction error).
+* Added data.frame `landsat_means` which contains the county-specific means of, respectively, pixels of the segments under corn and soybeans (LANDSAT readings).
 
 # CHANGES in rsae VERSION 0.2 (2022-05-23)
 

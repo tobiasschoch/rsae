@@ -201,7 +201,7 @@ plot.pred_model_b <- function(x, type = "e", sort = NULL, ...)
         op <- par(mfcol =c (1, 1), mar = c(8, 4, 2, 4))
         plot(1:g, means, type = "b", col = 2, lwd = 2, axes = FALSE,
              xlab = "", ylab = "predicted area mean", ylim = ra,
-             main = "Predicted means (+/- SQRT[MSPE])")
+             main = "Predicted means (+/- sqrt(mspe))")
         if (type == "l") {
             lines(1:g, means + sqrt(mspe), type = "b", col = 1, lwd = 2,
                   lty = 2, xlim = ra)
@@ -224,16 +224,10 @@ print.pred_model_b <- function(x, digits = max(3L, getOption("digits")
     - 3L), ...)
 {
     cat("Robustly Estimated/Predicted Area-Level Means:\n")
-
-    all <- cbind(x$raneff, x$fixeff, x$means, x$mspe)
-    colnames(all) <- if (is.null(x$mspe))
-        c("raneff", "fixeff", "area mean")
-    else
-        c("raneff", "fixeff", "area mean", "MSPE")
-
-    print.default(format(all, digits = digits), print.gap = 2, quote = FALSE)
+    m <- as.matrix.pred_model_b(x)
+    print.default(format(m, digits = digits), print.gap = 2, quote = FALSE)
     if (!is.null(x$mspe))
-        cat("(MSPE:", attr(x, "mspe"), "boostrap replicates)\n")
+        cat("(mpse:", attr(x, "mspe"), "boostrap replicates)\n")
 }
 # S3 residual method to extract residuals
 residuals.pred_model_b <- function(object, ...)
@@ -243,9 +237,12 @@ residuals.pred_model_b <- function(object, ...)
 # S3 as.matrix method
 as.matrix.pred_model_b <- function(x, ...)
 {
-    mat <- cbind(x$fixeff, x$raneff, x$means) #  "mspe" 
-    colnames(mat) <- c("fixeff", "raneff", "mean")
-    mat
+    m <- cbind(x$raneff, x$fixeff, x$means, x$mspe)
+    colnames(m) <- if (is.null(x$mspe))
+        c("raneff", "fixeff", "area mean")
+    else
+        c("raneff", "fixeff", "area mean", "mspe")
+    m
 }
 # S3 head method
 head.pred_model_b <- function(x, n = 6L, ...)
@@ -257,6 +254,3 @@ tail.pred_model_b <- function(x, n = 6L, keepnums = TRUE, addrownums, ...)
 {
     tail(as.matrix.pred_model_b(x), n, keepnums, addrownums, ...)
 }
-
-
-

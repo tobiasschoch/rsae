@@ -75,7 +75,7 @@ Rao, J.N.K. (2003). \emph{Small Area Estimation}, New York: John Wiley and Sons.
     \code{\link[=fitsaemodel]{fitsaemodel()}}
 }
 \examples{
-# use the landsat datsa
+# use the landsat data
 head(landsat)
 
 # set up the model

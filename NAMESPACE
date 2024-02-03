@@ -9,7 +9,7 @@ importFrom("stats",
     model.frame, model.response, model.matrix, pnorm, dnorm, rnorm, pt,
     printCoefmat, median)
 importFrom("utils",
-    setTxtProgressBar, txtProgressBar)
+    head, setTxtProgressBar, tail, txtProgressBar)
 
 # saemodel
 export(saemodel)
@@ -31,6 +31,9 @@ export(robpredict)
 S3method(print, pred_model_b)
 S3method(plot, pred_model_b)
 S3method(residuals, pred_model_b)
+S3method(as.matrix, pred_model_b)
+S3method(head, pred_model_b)
+S3method(tail, pred_model_b)
 
 # varia
 export(convergence)

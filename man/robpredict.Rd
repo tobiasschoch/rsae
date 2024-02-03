@@ -3,6 +3,10 @@
 \alias{print.pred_model_b}
 \alias{plot.pred_model_b}
 \alias{residuals.pred_model_b}
+\alias{as.matrix.pred_model_b}
+\alias{head.pred_model_b}
+\alias{tail.pred_model_b}
+
 \title{Robust Prediction of Random Effects, Fixed Effects, and
     Area-Specific Means}
 \description{
@@ -21,13 +25,16 @@ robpredict(fit, areameans = NULL, k = NULL, reps = NULL, seed = 1024,
     ...)
 \method{plot}{pred_model_b}(x, type = "e", sort = NULL, ...)
 \method{residuals}{pred_model_b}(object, ...)
+\method{as.matrix}{pred_model_b}(x, ...)
+\method{head}{pred_model_b}(x, n = 6L, ...)
+\method{tail}{pred_model_b}(x, n = 6L, keepnums = TRUE, addrownums, ...)
 }
 \arguments{
     \item{fit}{an object of class \code{fit_model_b}; a fitted SAE model.}
     \item{areameans}{\code{[matrix}]  or \code{[NULL]} area-level means of
         dimension \code{(g, p)}, where \code{g} and \code{p} denote,
         respectively, the number of areas and number of fixed-effects terms
-        in the regression model (incl. the intercept). By default,
+        in the regression model (incl. intercept). By default,
         \code{areadata = NULL} which implies that the predictions are
         base on the data used in fitting the model (not new data).}
     \item{k}{\code{[numeric]} or \code{[NULL]} robustness tuning constant
@@ -49,11 +56,17 @@ robpredict(fit, areameans = NULL, k = NULL, reps = NULL, seed = 1024,
     \item{type}{\code{[character]} type of \code{plot} method: \code{"e"}
         (error bars; default) or \code{"l"} (lines).}
     \item{sort}{\code{[character]} or \code{[NULL]} if \code{sort = "means"},
-        the predicted means are ploted in ascending order (default:
+        the predicted means are plotted in ascending order (default:
         \code{sort = NULL}); similarly, with \code{sort = "fixef"} and
         \code{sort = "ranef"} the predicted means are sorted along the
         fixed effects or the random effects, respectively.}
     \item{object}{an object of class \code{fit_model_b}.}
+    \item{n}{\code{[integer]} vector of length up to \code{dim(x)}, i.e.,
+        number of areas.}
+    \item{keepnums}{in each dimension, if no names in that dimension are
+        present, create them using the indices included in that dimension.
+        Ignored if \code{dim(x)} is \code{NULL} or its length 1.}
+    \item{addrownums}{deprecated - \code{keepnums} should be used instead.}
     \item{\dots}{additional arguments (not used).}
 }
 \details{
@@ -147,8 +160,13 @@ Sinha, S.K. and J.N.K. Rao (2009).
     \code{\link[=fitsaemodel]{fitsaemodel()}}
 }
 \examples{
-# generate a model with synthetic data
-model <- makedata()
+# use the landsat data
+head(landsat)
+
+# set up the model
+model <- saemodel(formula = HACorn ~ PixelsCorn + PixelsSoybeans,
+    area = ~CountyName,
+    data = subset(landsat, subset = (outlier == FALSE)))
 
 # summary of the model
 summary(model)
@@ -161,9 +179,15 @@ m
 summary(m)
 
 # robust prediction of the random effects and the area-level means (robust
-# EBLUP); here, we use the robustness tuning constant 'k = 1.8' for prediction
-m_predicted <- robpredict(m, k = 1.8)
+# EBLUP) using the counts-specific means (landsat_means)
+head(landsat_means)
+
+# for robust prediction, we use the robustness tuning constant 'k = 1.8'
+m_predicted <- robpredict(m, landsat_means, k = 1.8)
 head(m_predicted)
+
+# extract prediction as matrix
+as.matrix(m_predicted)
 
 # extract residuals from the predictions
 head(residuals(m_predicted))
@@ -171,6 +195,7 @@ head(residuals(m_predicted))
 # prediction incl. MSPE; parametric bootstrap with only 'reps = 10'
 # replications (for demonstration purposes; in practice, 'reps' should be
 # considerably larger)
-m_predicted_mspe <- robpredict(m, k = 1.8, reps = 10, progress_bar = FALSE)
+m_predicted_mspe <- robpredict(m, landsat_means, k = 1.8, reps = 10,
+                               progress_bar = FALSE)
 head(m_predicted_mspe)
 }

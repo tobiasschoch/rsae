@@ -127,5 +127,7 @@ summary.saemodel <- function(object, ...)
 # S3 method to extract the data as matrix
 as.matrix.saemodel <- function(x, ...)
 {
-    as.matrix(cbind(x$y, x$X, x$areaID))
+    m <- as.matrix(cbind(x$y, x$X, x$areaID))
+    colnames(m)[c(1, NCOL(m))] <- c("y", "areaID")
+    m
 }
