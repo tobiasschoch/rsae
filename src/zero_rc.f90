@@ -65,12 +65,12 @@ subroutine zero_rc ( a, b, t, arg, status, value )
 !
 !  Parameters:
 !
-!    Input, real ( kind = 8 ) A, B, the endpoints of the change of
+!    Input, double precission A, B, the endpoints of the change of
 !    sign interval.
 !
-!    Input, real ( kind = 8 ) T, a positive error tolerance.
+!    Input, double precission T, a positive error tolerance.
 !
-!    Output, real ( kind = 8 ) ARG, the currently considered point.  The user
+!    Output, double precission ARG, the currently considered point.  The user
 !    does not need to initialize this value.  On return with STATUS positive,
 !    the user is requested to evaluate the function at ARG, and return
 !    the value in VALUE.  On return with STATUS zero, ARG is the routine's
@@ -83,32 +83,32 @@ subroutine zero_rc ( a, b, t, arg, status, value )
 !    STATUS as 0, to indicate that the iteration is complete and that
 !    ARG is the estimated zero
 !
-!    Input, real ( kind = 8 ) VALUE, the function value at ARG, as requested
+!    Input, double precission VALUE, the function value at ARG, as requested
 !    by the routine on the previous call.
 !
   implicit none
 
-  real ( kind = 8 ) a
-  real ( kind = 8 ) arg
-  real ( kind = 8 ) b
-  real ( kind = 8 ), save :: c
-  real ( kind = 8 ), save :: d
-  real ( kind = 8 ), save :: e
-  real ( kind = 8 ), save :: fa
-  real ( kind = 8 ), save :: fb
-  real ( kind = 8 ), save :: fc
-  real ( kind = 8 ) m
-  real ( kind = 8 ), save :: machep
-  real ( kind = 8 ) p
-  real ( kind = 8 ) q
-  real ( kind = 8 ) r
-  real ( kind = 8 ) s
-  real ( kind = 8 ), save :: sa
-  real ( kind = 8 ), save :: sb
-  integer ( kind = 4 ) status
-  real ( kind = 8 ) t
-  real ( kind = 8 ) tol
-  real ( kind = 8 ) value
+  double precision a
+  double precision arg
+  double precision b
+  double precision, save :: c
+  double precision, save :: d
+  double precision, save :: e
+  double precision, save :: fa
+  double precision, save :: fb
+  double precision, save :: fc
+  double precision m
+  double precision, save :: machep
+  double precision p
+  double precision q
+  double precision r
+  double precision s
+  double precision, save :: sa
+  double precision, save :: sb
+  integer status
+  double precision t
+  double precision tol
+  double precision value
 !
 !  Input STATUS = 0.
 !  Initialize, request F(A).
