@@ -1,11 +1,10 @@
 # rsae: Robust Small Area Estimation<img src="inst/varia/logo.svg" align="right" width=120 height=139 alt="" />
 
-[![CRAN](https://www.r-pkg.org/badges/version/rsae)](https://cran.r-project.org/package=rsae)
-
+[![CRAN](https://www.r-pkg.org/badges/version/rsae)](https://cran.r-project.org/package=rsae) [![downloads](https://cranlogs.r-pkg.org/badges/rsae)](https://cran.r-project.org/package=rsae) [![downloads](https://cranlogs.r-pkg.org/badges/grand-total/rsae)](https://cran.r-project.org/package=rsae)
 
 ## Summary
 
-The `rsae` package is an `R` ([R Core Team, 2024](#references)) package that provides functions to estimate the parameters of the basic unit-level model in small area estimation (also known as model type "B" in [Rao, 2003](#references),  or nested-error regression model in [Battese et al., 1988](#references)). 
+The `rsae` package is an `R` ([R Core Team, 2024](#references)) package that provides functions to estimate the parameters of the basic unit-level model in small area estimation (also known as model type "B" in [Rao, 2003](#references),  or nested-error regression model in [Battese et al., 1988](#references)).
 
 In step 1, the model is fitted by one of the methods:
 
