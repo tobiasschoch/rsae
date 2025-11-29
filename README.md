@@ -1,6 +1,6 @@
 # rsae: Robust Small Area Estimation<img src="inst/varia/logo.svg" align="right" width=120 height=139 alt="" />
 
-[![CRAN](https://www.r-pkg.org/badges/version/rsae)](https://cran.r-project.org/package=rsae) [![downloads](https://cranlogs.r-pkg.org/badges/rsae)](https://cran.r-project.org/package=rsae) [![downloads](https://cranlogs.r-pkg.org/badges/grand-total/rsae)](https://cran.r-project.org/package=rsae)
+[![CRAN](https://www.r-pkg.org/badges/version/rsae)](https://cran.r-project.org/package=rsae) [![downloads](https://cranlogs.r-pkg.org/badges/rsae)](https://cran.r-project.org/package=rsae) [![downloads](https://cranlogs.r-pkg.org/badges/grand-total/rsae)](https://cran.r-project.org/package=rsae) [![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](https://www.awesomeofficialstatistics.org)
 
 ## Summary
 
